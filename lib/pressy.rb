@@ -1,5 +1,6 @@
 require "pressy/version"
 
 module Pressy
-  # Your code goes here...
 end
+
+require "pressy/post_renderer"
