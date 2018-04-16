@@ -7,6 +7,7 @@ RSpec.describe Pressy::PostRenderer do
       "post_title" => "This is a post",
       "post_content" => %{This is my content. Isn't it cool},
       "post_type" => "post",
+      "post_status" => "publish",
       "post_format" => "standard"
     )
   }
@@ -27,6 +28,7 @@ RSpec.describe Pressy::PostRenderer do
 ---
 id: 123
 title: This is a post
+status: publish
 ---
 This is my content. Isn't it cool
 CONTENT
@@ -38,6 +40,7 @@ CONTENT
     expect(rendered_post.content).to eq <<CONTENT
 ---
 id: 124
+status: draft
 ---
 This is my status update #blessed
 CONTENT

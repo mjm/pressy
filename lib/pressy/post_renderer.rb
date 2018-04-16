@@ -38,6 +38,7 @@ class Pressy::PostRenderer
     lines = []
     lines << "id: #{@post.id}" if @post.id
     lines << "title: #{@post.title}" unless @post.title.empty?
+    lines << "status: #{@post.status}"
     lines.join("\n")
   end
 end
