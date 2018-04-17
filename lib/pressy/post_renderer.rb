@@ -1,4 +1,5 @@
 require 'wordpress'
+require 'yaml'
 
 class Pressy::PostRenderer
   def initialize(post)
@@ -27,19 +28,17 @@ class Pressy::PostRenderer
 
   def content
     <<~"CONTENT"
-      ---
-      #{metadata}
-      ---
+      #{YAML.dump(metadata)}---
       #{@post.content}
       CONTENT
   end
 
   def metadata
-    lines = []
-    lines << "id: #{@post.id}" if @post.id
-    lines << "title: #{@post.title}" unless @post.title.empty?
-    lines << "status: #{@post.status}"
-    lines.join("\n")
+    {
+      "id" => @post.id,
+      "title" => @post.title.empty? ? nil : @post.title,
+      "status" => @post.status
+    }.compact
   end
 end
 
