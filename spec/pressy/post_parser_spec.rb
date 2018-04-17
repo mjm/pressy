@@ -34,6 +34,37 @@ RSpec.describe Pressy::PostParser do
     expect(post.content).to eq ""
   end
 
+  it "parses a post with empty metadata" do
+    content = <<~CONTENT
+      ---
+      ---
+      This is my post content.
+      CONTENT
+    post = Pressy::PostParser.new(format: 'standard', content: content).parse
+
+    expect(post.id).to be_nil
+    expect(post.title).to be_empty
+    expect(post.status).to eq "draft"
+    expect(post.format).to eq "standard"
+    expect(post.content).to eq "This is my post content.\n"
+  end
+
+  it "parses a post with partial metadata" do
+    content = <<~CONTENT
+      ---
+      title: Foo
+      ---
+      This is my post content.
+      CONTENT
+    post = Pressy::PostParser.new(format: 'standard', content: content).parse
+
+    expect(post.id).to be_nil
+    expect(post.title).to eq "Foo"
+    expect(post.status).to eq "draft"
+    expect(post.format).to eq "standard"
+    expect(post.content).to eq "This is my post content.\n"
+  end
+
   it "parses a standard post" do
     content = <<~CONTENT
       ---

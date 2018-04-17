@@ -33,11 +33,11 @@ class Pressy::PostParser
   end
 
   def parse_frontmatter(lines)
-    frontmatter = YAML.load(lines.join(""))
+    frontmatter = YAML.load(lines.join("")) || {}
     {
       "post_id" => frontmatter["id"],
       "post_title" => frontmatter["title"],
       "post_status" => frontmatter["status"]
-    }
+    }.compact
   end
 end
