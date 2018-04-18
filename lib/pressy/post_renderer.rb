@@ -1,5 +1,6 @@
 require 'wordpress'
 require 'yaml'
+require 'digest'
 
 class Pressy::PostRenderer
   def initialize(post)
@@ -7,7 +8,7 @@ class Pressy::PostRenderer
   end
 
   def render
-    Pressy::RenderedPost.new(path, content)
+    Pressy::RenderedPost.new(path, content, digest)
   end
 
   def path
@@ -27,7 +28,7 @@ class Pressy::PostRenderer
   end
 
   def content
-    <<~"CONTENT"
+    @content ||= <<~"CONTENT"
       #{YAML.dump(metadata)}---
       #{@post.content}
       CONTENT
@@ -40,6 +41,10 @@ class Pressy::PostRenderer
       "status" => @post.status
     }.compact
   end
+
+  def digest
+    Digest::SHA256.hexdigest(content)
+  end
 end
 
-Pressy::RenderedPost = Struct.new(:path, :content)
+Pressy::RenderedPost = Struct.new(:path, :content, :digest)

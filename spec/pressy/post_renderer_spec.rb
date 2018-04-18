@@ -32,6 +32,7 @@ status: publish
 ---
 This is my content. Isn't it cool
 CONTENT
+    expect(rendered_post.digest).to eq 'a3ba2cc9a4b22cd7632df3ff450d12e5a6ccbe3da4ac0dcdc054ce46f1ef67c9'
   end
 
   it "renders a status post" do
@@ -44,5 +45,12 @@ status: draft
 ---
 This is my status update #blessed
 CONTENT
+    expect(rendered_post.digest).to eq 'ee821faa47aec9f8d042495fef35297241d5abdc73aa0869931535f3a8d994c7'
+  end
+
+  it "produces the same digest for the same post" do
+    rendered_post = Pressy::PostRenderer.new(post).render
+    rendered_post2 = Pressy::PostRenderer.new(Wordpress::Post.new(post.fields)).render
+    expect(rendered_post.digest).to eq rendered_post2.digest
   end
 end
