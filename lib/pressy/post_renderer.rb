@@ -23,7 +23,7 @@ class Pressy::PostRenderer
     if @post.title.empty?
       @post.content.downcase.gsub(%r{[^a-z0-9 ]}, '').split(%r{ +}).take(5).join('-')
     else
-      @post.title.downcase.gsub(%r{[ /:]+}, '-')
+      @post.title.downcase.gsub(%r{[^a-z0-9 ]}, '').gsub(%r{ +}, '-')
     end
   end
 
