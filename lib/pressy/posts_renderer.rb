@@ -8,14 +8,23 @@ class Pressy::PostsRenderer
   end
 
   def render
-    Pressy::RenderedPosts.new(rendered_posts)
+    Pressy::RenderedPosts.new(rendered_posts, digests)
   end
 
   private
 
+  def rendered_posts_by_id
+    @rendered_posts_by_id ||=
+      Hash[posts.map { |post| [post.id, Pressy::PostRenderer.new(post).render] }]
+  end
+
   def rendered_posts
-    posts.map {|post| Pressy::PostRenderer.new(post).render }
+    rendered_posts_by_id.values
+  end
+
+  def digests
+    rendered_posts_by_id.transform_values(&:digest)
   end
 end
 
-Pressy::RenderedPosts = Struct.new(:posts)
+Pressy::RenderedPosts = Struct.new(:posts, :digests)
