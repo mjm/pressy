@@ -20,4 +20,8 @@ class Pressy::Store::FileStore
     Dir.mkdir(File.dirname(path)) rescue nil
     File.write(path, post.content)
   end
+
+  def digests
+    YAML.load_file(File.join(root, ".pressy", "digests.yml")) rescue {}
+  end
 end
