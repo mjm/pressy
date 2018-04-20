@@ -95,6 +95,26 @@ RSpec.describe Pressy::Store::FileStore do
     end
   end
 
+  context "writing cached digests" do
+    it "writes successfully if there is no digests file" do
+      digests = {
+        1 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
+      }
+      empty_store.write_digests(digests)
+
+      expect(empty_store.digests).to eq digests
+    end
+
+    it "overwrites the existing digests if a file already exists" do
+      digests = {
+        1 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
+      }
+      example_store.write_digests(digests)
+
+      expect(example_store.digests).to eq digests
+    end
+  end
+
   def store(name)
     Pressy::Store::FileStore.new(copy_store(name))
   end

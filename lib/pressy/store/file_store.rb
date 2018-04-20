@@ -16,12 +16,31 @@ class Pressy::Store::FileStore
   end
 
   def write(post)
-    path = File.join(root, post.path)
-    Dir.mkdir(File.dirname(path)) rescue nil
+    path = post_path(post)
+    create_parent_directory path
     File.write(path, post.content)
   end
 
   def digests
-    YAML.load_file(File.join(root, ".pressy", "digests.yml")) rescue {}
+    YAML.load_file(digests_path) rescue {}
+  end
+
+  def write_digests(digests)
+    create_parent_directory digests_path
+    File.write(digests_path, YAML.dump(digests))
+  end
+
+  private
+
+  def post_path(post)
+    File.join(root, post.path)
+  end
+
+  def digests_path
+    File.join(root, ".pressy", "digests.yml")
+  end
+
+  def create_parent_directory(path)
+    Dir.mkdir(File.dirname(path)) rescue nil
   end
 end
