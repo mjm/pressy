@@ -14,4 +14,10 @@ class Pressy::Store::FileStore
         Digest::SHA256.hexdigest(content))
     end
   end
+
+  def write(post)
+    path = File.join(root, post.path)
+    Dir.mkdir(File.dirname(path)) rescue nil
+    File.write(path, post.content)
+  end
 end
