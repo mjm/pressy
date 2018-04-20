@@ -115,6 +115,20 @@ RSpec.describe Pressy::Store::FileStore do
     end
   end
 
+  context "reading configuration" do
+    it "reads an empty hash if there is no configuration file" do
+      expect(empty_store.configuration).to eq({})
+    end
+
+    it "reads the configuration from the config YAML file" do
+      expect(example_store.configuration).to eq ({
+        "site" => {
+          "host" => "example.com"
+        }
+      })
+    end
+  end
+
   def store(name)
     Pressy::Store::FileStore.new(copy_store(name))
   end

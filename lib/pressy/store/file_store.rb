@@ -30,6 +30,10 @@ class Pressy::Store::FileStore
     File.write(digests_path, YAML.dump(digests))
   end
 
+  def configuration
+    YAML.load_file(configuration_path) rescue {}
+  end
+
   private
 
   def post_path(post)
@@ -38,6 +42,10 @@ class Pressy::Store::FileStore
 
   def digests_path
     File.join(root, ".pressy", "digests.yml")
+  end
+
+  def configuration_path
+    File.join(root, ".pressy", "config.yml")
   end
 
   def create_parent_directory(path)
