@@ -22,7 +22,7 @@ RSpec.describe Pressy::PostRenderer do
   }
 
   it "renders a standard post" do
-    rendered_post = Pressy::PostRenderer.new(post).render
+    rendered_post = Pressy::PostRenderer.render(post)
     expect(rendered_post.path).to eq "standard/this-is-a-post.md"
     expect(rendered_post.content).to eq <<CONTENT
 ---
@@ -36,7 +36,7 @@ CONTENT
   end
 
   it "renders a status post" do
-    rendered_post = Pressy::PostRenderer.new(status).render
+    rendered_post = Pressy::PostRenderer.render(status)
     expect(rendered_post.path).to eq "status/this-is-my-status-update.md"
     expect(rendered_post.content).to eq <<CONTENT
 ---
@@ -49,8 +49,8 @@ CONTENT
   end
 
   it "produces the same digest for the same post" do
-    rendered_post = Pressy::PostRenderer.new(post).render
-    rendered_post2 = Pressy::PostRenderer.new(Wordpress::Post.new(post.fields)).render
+    rendered_post = Pressy::PostRenderer.render(post)
+    rendered_post2 = Pressy::PostRenderer.render(Wordpress::Post.new(post.fields))
     expect(rendered_post.digest).to eq rendered_post2.digest
   end
 end

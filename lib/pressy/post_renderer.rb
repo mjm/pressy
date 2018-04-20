@@ -11,6 +11,12 @@ class Pressy::PostRenderer
     Pressy::RenderedPost.new(path, content, digest)
   end
 
+  def self.render(post)
+    self.new(post).render
+  end
+
+  private
+
   def path
     File.join(@post.format, filename)
   end
