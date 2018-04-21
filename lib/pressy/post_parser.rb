@@ -26,6 +26,10 @@ class Pressy::PostParser
     end
   end
 
+  def self.parse(params)
+    self.new(params).parse
+  end
+
   private
 
   def lines
