@@ -6,9 +6,36 @@ class Pressy::Site
     create_client
   end
 
+  def pull
+    pull = Pressy::Action::Pull.new(
+      local: fetch_local_posts,
+      server: fetch_server_posts
+    )
+
+    Pressy::PullResult.new(pull)
+  end
+
   private
 
   def create_client
     @client = Wordpress.connect(store.configuration)
+  end
+
+  def fetch_local_posts
+    store.all_posts
+  end
+
+  def fetch_server_posts
+    client.fetch_posts.to_a
+  end
+end
+
+class Pressy::PullResult
+  def initialize(pull)
+    @has_changes = pull.has_changes?
+  end
+
+  def has_changes?
+    @has_changes
   end
 end
