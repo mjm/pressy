@@ -20,7 +20,8 @@ RSpec.describe Pressy::Site do
   end
 
   it "creates a new site with a configured Wordpress client" do
-    expect(Wordpress).to receive(:connect).with(config) { wordpress }
+    expected_config = { host: "example.com", username: "alex", password: "pressy" }
+    expect(Wordpress).to receive(:connect).with(expected_config) { wordpress }
     Pressy::Site.new(store)
   end
 

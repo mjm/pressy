@@ -26,7 +26,11 @@ class Pressy::Site
   private
 
   def create_client
-    @client = Wordpress.connect(store.configuration)
+    @client = Wordpress.connect(site_configuration)
+  end
+
+  def site_configuration
+    store.configuration["site"].transform_keys(&:to_sym)
   end
 
   def fetch_local_posts
