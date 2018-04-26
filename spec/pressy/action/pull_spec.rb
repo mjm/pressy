@@ -8,6 +8,7 @@ RSpec.describe Pressy::Action::Pull do
     
     it "has no changes" do
       expect(subject).not_to have_changes
+      expect(subject.changed_posts).to be_empty
     end
   end
 
@@ -28,6 +29,7 @@ RSpec.describe Pressy::Action::Pull do
 
     it "has no changes" do
       expect(subject).not_to have_changes
+      expect(subject.changed_posts).to be_empty
     end
   end
 
@@ -49,6 +51,7 @@ RSpec.describe Pressy::Action::Pull do
 
       it "has changes" do
         expect(subject).to have_changes
+        expect(subject.changed_posts).to eq({1 => rendered_server_post})
       end
     end
   end
@@ -66,6 +69,7 @@ RSpec.describe Pressy::Action::Pull do
 
     it "has changes" do
       expect(subject).to have_changes
+      expect(subject.changed_posts).to eq({1 => rendered_server_post})
     end
   end
 end

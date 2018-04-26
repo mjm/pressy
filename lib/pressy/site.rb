@@ -12,6 +12,14 @@ class Pressy::Site
       server: fetch_server_posts
     )
 
+    digests = {}
+    pull.changed_posts.each_pair do |id, post|
+      store.write(post)
+      digests[id] = post.digest
+    end
+
+    store.write_digests(digests) if pull.has_changes?
+
     Pressy::PullResult.new(pull)
   end
 

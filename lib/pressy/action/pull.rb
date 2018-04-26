@@ -11,26 +11,30 @@ class Pressy::Action::Pull
   end
 
   def changed_posts
+    @changes ||= collect_changed_posts
+  end
+
+  private
+
+  def collect_changed_posts
     local = parsed_local_posts
 
-    changes = []
+    changes = {}
 
     server_posts_by_id.each_pair do |id, post|
       local_post = local[id]
       if local_post
         rendered = Pressy::PostRenderer.render(post)
         if rendered.digest != local_post.original.digest
-          changes << rendered
+          changes[id] = rendered
         end
       else
-        changes << Pressy::PostRenderer.render(post)
+        changes[id] = Pressy::PostRenderer.render(post)
       end
     end
     
     changes
   end
-
-  private
 
   def local_posts
     @local_posts.map {|post| LocalPost.new(post, parse_local_post(post)) }
