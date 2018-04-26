@@ -20,6 +20,17 @@ RSpec.describe Pressy::PostRenderer do
       "post_format" => "status"
     )
   }
+  let(:instagram) {
+    Wordpress::Post.new(
+      "post_id" => 125,
+      "post_content" => %{<div class="e-content">
+He’s making it very difficult to get out of bed.
+</div>
+[gallery size=full columns=1]},
+      "post_status" => "publish",
+      "post_format" => "standard"
+    )
+  }
 
   it "renders a standard post" do
     rendered_post = Pressy::PostRenderer.render(post)
@@ -46,6 +57,22 @@ status: draft
 This is my status update #blessed
 CONTENT
     expect(rendered_post.digest).to eq 'ee821faa47aec9f8d042495fef35297241d5abdc73aa0869931535f3a8d994c7'
+  end
+
+  it "renders a post from OwnYourGram" do
+    rendered_post = Pressy::PostRenderer.render(instagram)
+    expect(rendered_post.path).to eq "standard/hes-making-it-very-difficult.md"
+    expect(rendered_post.content).to eq <<CONTENT
+---
+id: 125
+status: publish
+---
+<div class="e-content">
+He’s making it very difficult to get out of bed.
+</div>
+[gallery size=full columns=1]
+CONTENT
+    expect(rendered_post.digest).to eq '5704d3a8c853872078ed02048454fcdb664dd018950ea5e114c5b762ddbc72f7'
   end
 
   it "produces the same digest for the same post" do

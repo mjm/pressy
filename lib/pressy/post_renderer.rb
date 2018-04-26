@@ -27,7 +27,7 @@ class Pressy::PostRenderer
 
   def path_friendly_title
     if @post.title.empty?
-      @post.content.downcase.gsub(%r{[^a-z0-9 ]}, '').split(%r{ +}).take(5).join('-')
+      @post.content.downcase.gsub(/<\/?[^>]*>/, "").gsub(%r{[^a-z0-9 ]}, '').split(%r{ +}).take(5).join('-')
     else
       @post.title.downcase.gsub(%r{[^a-z0-9 ]}, '').gsub(%r{ +}, '-')
     end
