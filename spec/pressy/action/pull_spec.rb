@@ -52,6 +52,22 @@ RSpec.describe Pressy::Action::Pull do
       end
     end
   end
+
+  context "when the server has added a new post" do
+    let(:local_posts) { [] }
+    let(:server_posts) { [server_post(id: 1)] }
+    let(:rendered_server_post) { rendered_post(digest: "def") }
+
+    subject { Pull.new(local: local_posts, server: server_posts) }
+
+    before(:each) do
+      expect(Pressy::PostRenderer).to receive(:render).with(server_posts.first) { rendered_server_post }
+    end
+
+    it "has changes" do
+      expect(subject).to have_changes
+    end
+  end
 end
 
 def rendered_post(params = {})
