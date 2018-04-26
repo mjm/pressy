@@ -1,3 +1,15 @@
 #!/usr/bin/env ruby
-
 require "pressy"
+
+store = Pressy::Store::FileStore.new(Dir.pwd)
+site = Pressy::Site.new(store)
+
+action = ARGV.shift
+raise "no action given" unless action
+
+case action.to_sym
+when :pull
+  site.pull
+else
+  raise "unexpected action '#{action}'"
+end
