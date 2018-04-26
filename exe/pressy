@@ -9,7 +9,12 @@ raise "no action given" unless action
 
 case action.to_sym
 when :pull
-  site.pull
+  result = site.pull
+  if result.has_changes?
+    $stderr.puts "Updated #{result.changed_posts.count} posts."
+  else
+    $stderr.puts "Already up-to-date."
+  end
 else
   raise "unexpected action '#{action}'"
 end

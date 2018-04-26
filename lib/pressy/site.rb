@@ -20,7 +20,7 @@ class Pressy::Site
 
     store.write_digests(digests) if pull.has_changes?
 
-    Pressy::PullResult.new(pull)
+    pull
   end
 
   private

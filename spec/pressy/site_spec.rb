@@ -26,13 +26,16 @@ RSpec.describe Pressy::Site do
   end
 
   describe "pulling changes" do
+    subject(:pull) { site.pull }
+
     context "when the site is empty" do
       it "has no changes" do
         expect_pull local: [], server: [], has_changes?: false, changed_posts: {}
         expect(store).not_to receive(:write)
         expect(store).not_to receive(:write_digests)
 
-        expect(site.pull).not_to have_changes
+        expect(pull).not_to have_changes
+        expect(pull.changed_posts).to be_empty
       end
     end
 
@@ -48,7 +51,8 @@ RSpec.describe Pressy::Site do
         expect(store).not_to receive(:write)
         expect(store).not_to receive(:write_digests)
 
-        expect(site.pull).not_to have_changes
+        expect(pull).not_to have_changes
+        expect(pull.changed_posts).to be_empty
       end
     end
 
@@ -66,7 +70,8 @@ RSpec.describe Pressy::Site do
         expect(store).to receive(:write).with(new_post)
         expect(store).to receive(:write_digests).with({ 123 => "abcdefg" })
 
-        expect(site.pull).to have_changes
+        expect(pull).to have_changes
+        expect(pull.changed_posts.count).to eq 1
       end
     end
 
