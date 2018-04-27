@@ -1,28 +1,38 @@
 # Pressy
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pressy`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Pressy lets you work with your WordPress site as though you were using a static site generator like [Jekyll](https://jekyllrb.com).
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'pressy'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+You can install Pressy using RubyGems:
 
     $ gem install pressy
 
+This will install the `pressy` command-line tool.
+
 ## Usage
 
-TODO: Write usage instructions here
+### Initializing a new site directory
+
+Before you can use Pressy, you need to set up a directory to hold the files for your site.
+
+    $ mkdir example.com
+    $ cd example.com
+    $ pressy init
+    # TODO output from init
+
+This will create a `.pressy/config.yml` file in the `example.com` directory. This configuration will allow subsequent `pressy` commands to connect to your WordPress site.
+
+### Pulling changes from WordPress
+
+To sync the contents of your posts on WordPress to your local directory, you can run `pressy pull`.
+
+    $ pressy pull
+    Updated 5 posts.
+
+```
+TODO more commands
+```
 
 ## Development
 
@@ -32,7 +42,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pressy. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/mjm/pressy. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -40,4 +50,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Pressy project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/pressy/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Pressy project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/mjm/pressy/blob/master/CODE_OF_CONDUCT.md).
