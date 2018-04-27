@@ -22,15 +22,29 @@ class Pressy::PostRenderer
   end
 
   def filename
-    "#{path_friendly_title}.md"
+    "#{filename_components.join('-')}.md"
   end
 
-  def path_friendly_title
-    if @post.title.empty?
-      @post.content.downcase.gsub(/<\/?[^>]*>/, "").gsub(%r{[^a-z0-9 ]}, '').split(%r{ +}).take(5).join('-')
-    else
-      @post.title.downcase.gsub(%r{[^a-z0-9 ]}, '').gsub(%r{ +}, '-')
-    end
+  def filename_components
+    @post.title.empty? ? content_components : title_components
+  end
+
+  HTML_TAGS = /<\/?[^>]*>/
+  CHARACTERS_TO_STRIP = %r{[^a-z0-9 ]}
+  SPACES = %r{\s+}
+
+  def content_components
+    content_without_tags.split("\n").map{ |s| s.gsub(CHARACTERS_TO_STRIP, '') }
+      .reject {|s| s.strip.empty? }
+      .first.split(SPACES).take(5)
+  end
+
+  def content_without_tags
+    @post.content.downcase.gsub(HTML_TAGS, "")
+  end
+
+  def title_components
+    @post.title.downcase.gsub(CHARACTERS_TO_STRIP, '').split(SPACES)
   end
 
   def content

@@ -24,7 +24,7 @@ RSpec.describe Pressy::PostRenderer do
     Wordpress::Post.new(
       "post_id" => 125,
       "post_content" => %{<div class="e-content">
-He’s making it very difficult to get out of bed.
+Foo bar
 </div>
 [gallery size=full columns=1]},
       "post_status" => "publish",
@@ -61,18 +61,18 @@ CONTENT
 
   it "renders a post from OwnYourGram" do
     rendered_post = Pressy::PostRenderer.render(instagram)
-    expect(rendered_post.path).to eq "standard/hes-making-it-very-difficult.md"
+    expect(rendered_post.path).to eq "standard/foo-bar.md"
     expect(rendered_post.content).to eq <<CONTENT
 ---
 id: 125
 status: publish
 ---
 <div class="e-content">
-He’s making it very difficult to get out of bed.
+Foo bar
 </div>
 [gallery size=full columns=1]
 CONTENT
-    expect(rendered_post.digest).to eq '5704d3a8c853872078ed02048454fcdb664dd018950ea5e114c5b762ddbc72f7'
+    expect(rendered_post.digest).to eq '54d78244bd8f566534e81011a1a41542f7de801b181c42930b19ddc0710c1daa'
   end
 
   it "produces the same digest for the same post" do
