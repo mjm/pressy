@@ -67,4 +67,5 @@ class Pressy::PostRenderer
   end
 end
 
-Pressy::RenderedPost = Struct.new(:path, :content, :digest)
+class Pressy::RenderedPost < Struct.new(:path, :content, :digest)
+end
