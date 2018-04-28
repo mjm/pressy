@@ -17,7 +17,8 @@ RSpec.describe Pressy::PostRenderer do
       "post_title" => "",
       "post_content" => %{This is my status update #blessed},
       "post_type" => "post",
-      "post_format" => "status"
+      "post_format" => "status",
+      "post_date_gmt" => XMLRPC::DateTime.new(2018, 12, 25, 1, 1, 1)
     )
   }
 
@@ -37,7 +38,7 @@ CONTENT
 
   it "renders a status post" do
     rendered_post = Pressy::PostRenderer.render(status)
-    expect(rendered_post.path).to eq "status/this-is-my-status-update.md"
+    expect(rendered_post.path).to eq "status/2018-12-25-this-is-my-status-update.md"
     expect(rendered_post.content).to eq <<CONTENT
 ---
 id: 124
@@ -79,5 +80,11 @@ Foo bar
   it "generates a filename from only the first line of content" do
     generator = Pressy::PostFilenameGenerator.new("", "This is\nmy post")
     expect(generator.filename).to eq "this-is.md"
+  end
+
+  it "generates a filename with the post date" do
+    date = Time.utc(2018, 1, 1, 8, 0, 0)
+    generator = Pressy::PostFilenameGenerator.new("Foo bar baz", "Whatever", date)
+    expect(generator.filename).to eq "2018-01-01-foo-bar-baz.md"
   end
 end

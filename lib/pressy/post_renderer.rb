@@ -31,7 +31,7 @@ class Pressy::PostRenderer
   end
 
   def filename
-    Pressy::PostFilenameGenerator.new(@post.title, @post.content).filename
+    Pressy::PostFilenameGenerator.new(@post.title, @post.content, @post.published_at).filename
   end
 
   def content
@@ -55,18 +55,27 @@ class Pressy::PostRenderer
 end
 
 class Pressy::PostFilenameGenerator # :nodoc:
-  attr_reader :title, :content
+  attr_reader :title, :content, :date
 
-  def initialize(title, content)
+  def initialize(title, content, date=nil)
     @title = title
     @content = content
+    @date = date
   end
 
   def filename
-    "#{filename_components.join('-')}.md"
+    "#{date_prefix}#{filename_components.join('-')}.md"
   end
 
   private
+
+  def date_prefix
+    if date
+      date.strftime("%Y-%m-%d-")
+    else
+      ""
+    end
+  end
 
   def filename_components
     title.empty? ? content_components : title_components
