@@ -31,29 +31,7 @@ class Pressy::PostRenderer
   end
 
   def filename
-    "#{filename_components.join('-')}.md"
-  end
-
-  def filename_components
-    @post.title.empty? ? content_components : title_components
-  end
-
-  HTML_TAGS = /<\/?[^>]*>/
-  CHARACTERS_TO_STRIP = %r{[^a-z0-9 ]}
-  SPACES = %r{\s+}
-
-  def content_components
-    content_without_tags.split("\n").map{ |s| s.gsub(CHARACTERS_TO_STRIP, '') }
-      .reject {|s| s.strip.empty? }
-      .first.split(SPACES).take(5)
-  end
-
-  def content_without_tags
-    @post.content.downcase.gsub(HTML_TAGS, "")
-  end
-
-  def title_components
-    @post.title.downcase.gsub(CHARACTERS_TO_STRIP, '').split(SPACES)
+    Pressy::PostFilenameGenerator.new(@post.title, @post.content).filename
   end
 
   def content
@@ -73,6 +51,48 @@ class Pressy::PostRenderer
 
   def digest
     Digest::SHA256.hexdigest(content)
+  end
+end
+
+class Pressy::PostFilenameGenerator # :nodoc:
+  attr_reader :title, :content
+
+  def initialize(title, content)
+    @title = title
+    @content = content
+  end
+
+  def filename
+    "#{filename_components.join('-')}.md"
+  end
+
+  private
+
+  def filename_components
+    title.empty? ? content_components : title_components
+  end
+
+  HTML_TAGS = /<\/?[^>]*>/
+  CHARACTERS_TO_STRIP = %r{[^a-z0-9 ]}
+  SPACES = %r{\s+}
+
+  def content_components
+    content_lines
+      .map {|s| s.gsub(CHARACTERS_TO_STRIP, '') }
+      .reject {|s| s.strip.empty? }
+      .first.split(SPACES).take(5)
+  end
+
+  def content_lines
+    content_without_tags.split("\n")
+  end
+
+  def content_without_tags
+    content.downcase.gsub(HTML_TAGS, "")
+  end
+
+  def title_components
+    title.downcase.gsub(CHARACTERS_TO_STRIP, '').split(SPACES)
   end
 end
 

@@ -20,17 +20,6 @@ RSpec.describe Pressy::PostRenderer do
       "post_format" => "status"
     )
   }
-  let(:instagram) {
-    Wordpress::Post.new(
-      "post_id" => 125,
-      "post_content" => %{<div class="e-content">
-Foo bar
-</div>
-[gallery size=full columns=1]},
-      "post_status" => "publish",
-      "post_format" => "standard"
-    )
-  }
 
   it "renders a standard post" do
     rendered_post = Pressy::PostRenderer.render(post)
@@ -59,25 +48,36 @@ CONTENT
     expect(rendered_post.digest).to eq 'ee821faa47aec9f8d042495fef35297241d5abdc73aa0869931535f3a8d994c7'
   end
 
-  it "renders a post from OwnYourGram" do
-    rendered_post = Pressy::PostRenderer.render(instagram)
-    expect(rendered_post.path).to eq "standard/foo-bar.md"
-    expect(rendered_post.content).to eq <<CONTENT
----
-id: 125
-status: publish
----
-<div class="e-content">
-Foo bar
-</div>
-[gallery size=full columns=1]
-CONTENT
-    expect(rendered_post.digest).to eq '54d78244bd8f566534e81011a1a41542f7de801b181c42930b19ddc0710c1daa'
-  end
-
   it "produces the same digest for the same post" do
     rendered_post = Pressy::PostRenderer.render(post)
     rendered_post2 = Pressy::PostRenderer.render(Wordpress::Post.new(post.fields))
     expect(rendered_post.digest).to eq rendered_post2.digest
+  end
+end
+
+RSpec.describe Pressy::PostFilenameGenerator do
+  it "generates a filename for a post with a title" do
+    generator = Pressy::PostFilenameGenerator.new("This is a post", "Blah blah")
+    expect(generator.filename).to eq "this-is-a-post.md"
+  end
+
+  it "generates a filename from basic post content" do
+    generator = Pressy::PostFilenameGenerator.new("", "This is my #status #update. #blessed")
+    expect(generator.filename).to eq "this-is-my-status-update.md"
+  end
+
+  it "generates a filename stripped of HTML" do
+    generator = Pressy::PostFilenameGenerator.new("", %Q{
+<div class="e-content">
+Foo bar
+</div>
+[gallery size=full columns=1]
+})
+    expect(generator.filename).to eq "foo-bar.md"
+  end
+
+  it "generates a filename from only the first line of content" do
+    generator = Pressy::PostFilenameGenerator.new("", "This is\nmy post")
+    expect(generator.filename).to eq "this-is.md"
   end
 end
