@@ -106,5 +106,12 @@ class Pressy::PostFilenameGenerator
   end
 end
 
+# A RenderedPost represents a post as it is represented in a Store.
+# @!attribute path
+#   @return The file path where the post is stored
+# @!attribute content
+#   @return The rendered text content of the post
+# @!attribute digest
+#   @return The SHA256 hash of the post content
 class Pressy::RenderedPost < Struct.new(:path, :content, :digest)
 end
