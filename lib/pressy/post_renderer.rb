@@ -54,7 +54,8 @@ class Pressy::PostRenderer
   end
 end
 
-class Pressy::PostFilenameGenerator # :nodoc:
+# @api private
+class Pressy::PostFilenameGenerator
   attr_reader :title, :content, :date
 
   def initialize(title, content, date=nil)
