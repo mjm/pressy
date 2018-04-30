@@ -46,19 +46,19 @@ class Pressy::LocalChangeset
     !(diff.added.empty? && diff.updated.empty? && diff.deleted.empty?)
   end
 
-  # @return [Array<Pressy::RenderedPost>]
+  # @return [Hash{Fixnum => Pressy::RenderedPost}]
   #   a list of posts to create in the store
   def added_posts
     diff.added
   end
 
-  # @return [Array<Pressy::RenderedPost>]
+  # @return [Hash{Fixnum => Pressy::RenderedPost}]
   #   a list of posts to update in the store
   def updated_posts
     diff.updated
   end
 
-  # @return [Array<Pressy::RenderedPost>]
+  # @return [Hash{Fixnum => Pressy::RenderedPost}]
   #   a list of posts to remove from the store
   def deleted_posts
     diff.deleted
@@ -73,11 +73,10 @@ class Pressy::LocalChangeset
   end
 
   def build_diff
-    added = @server_posts.reject {|id, post| @local_posts.has_key? id }.values
+    added = @server_posts.reject {|id, post| @local_posts.has_key? id }
     updated = @server_posts
       .select {|id, post| @local_posts[id] && @local_posts[id].digest != post.digest }
-      .values
-    deleted = @local_posts.reject {|id, post| @server_posts.has_key? id }.values
+    deleted = @local_posts.reject {|id, post| @server_posts.has_key? id }
 
     Diff.new(added, updated, deleted)
   end

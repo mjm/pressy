@@ -34,7 +34,7 @@ RSpec.describe Pressy::LocalChangeset do
     end
 
     it "has an added post" do
-      expect(subject.added_posts).to eq [new_post]
+      expect(subject.added_posts).to eq({ 123 => new_post })
     end
 
     it "has no updated posts" do
@@ -64,7 +64,7 @@ RSpec.describe Pressy::LocalChangeset do
     end
 
     it "has a deleted post" do
-      expect(subject.deleted_posts).to eq [deleted_post]
+      expect(subject.deleted_posts).to eq({ 123 => deleted_post })
     end
   end
 
@@ -115,7 +115,7 @@ RSpec.describe Pressy::LocalChangeset do
     it "has an updated post" do
       # TODO this should probably return something that includes the original post
       # that way we can move the post if the filename changed
-      expect(subject.updated_posts).to eq [server_post]
+      expect(subject.updated_posts).to eq({ 123 => server_post })
     end
 
     it "has no deleted posts" do
