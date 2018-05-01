@@ -25,6 +25,8 @@ class Pressy::LocalChangeset
 
   # Adds a rendered post from the local store to the changeset.
   #
+  # If the id is nil, the post is a local-only draft and will be ignored.
+  #
   # If no server post is added with the same id, this post will be present in
   # {#deleted_posts}.
   #
@@ -33,6 +35,8 @@ class Pressy::LocalChangeset
   #
   # @return [self] the updated changeset
   def add_local_post(id, post)
+    return self unless id
+
     @local_posts[id] = post
     @diff = nil
     self

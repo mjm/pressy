@@ -123,6 +123,31 @@ RSpec.describe Pressy::LocalChangeset do
     end
   end
 
+  context "a changeset with a draft post" do
+    let(:draft_post) { double(:draft_post, digest: "abc") }
+
+    subject {
+      Pressy::LocalChangeset.new
+        .add_local_post(nil, draft_post)
+    }
+
+    it "has no changes" do
+      expect(subject).not_to have_changes
+    end
+
+    it "has no added posts" do
+      expect(subject.added_posts).to be_empty
+    end
+
+    it "has no updated posts" do
+      expect(subject.updated_posts).to be_empty
+    end
+
+    it "has no deleted posts" do
+      expect(subject.deleted_posts).to be_empty
+    end
+  end
+
   it "updates the diff results when posts are added" do
     changes = Pressy::LocalChangeset.new
     expect(changes.added_posts).to be_empty
