@@ -1,5 +1,6 @@
 # A LocalChangeset holds set of changes to apply to a local Store.
 class Pressy::LocalChangeset
+  # Creates a new, empty changeset.
   def initialize
     @server_posts = {}
     @local_posts = {}
@@ -81,6 +82,7 @@ class Pressy::LocalChangeset
     Diff.new(added, updated, deleted)
   end
 
+  # @api private
   Diff = Struct.new(:added, :updated, :deleted)
 end
 
