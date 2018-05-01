@@ -80,6 +80,15 @@ RSpec.describe Pressy::Store::FileStore do
     end
   end
 
+  context "deleting posts" do
+    it "deletes a post that exists" do
+      post_to_delete = example_store.all_posts.first
+      example_store.delete(post_to_delete)
+
+      expect(example_store.all_posts.count).to be 3
+    end
+  end
+
   context "reading cached digests" do
     it "reads empty data if there is no digests file" do
       expect(empty_store.digests).to eq({})

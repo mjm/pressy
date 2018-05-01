@@ -33,6 +33,12 @@ class Pressy::Store::FileStore
     File.write(path, post.content)
   end
 
+  # Deletes a post from disk.
+  # @param post [Pressy::RenderedPost] the post to delete
+  def delete(post)
+    File.unlink(post_path(post))
+  end
+
   # @return [Hash] the saved digests for each post, by ID
   def digests
     YAML.load_file(digests_path) rescue {}
