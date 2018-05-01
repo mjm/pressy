@@ -86,6 +86,24 @@ RSpec.describe Pressy::Site do
       end
     end
 
+    context "when the site has deleted a post" do
+      let(:deleted_post) { double(:deleted_post) }
+
+      it "deletes the post from the store" do
+        expect_pull(
+          local: [double(:local_post)],
+          server: [],
+          has_changes?: true,
+          changeset: make_changeset(deleted_posts: {1 => deleted_post})
+        )
+
+        expect(store).to receive(:delete).with(deleted_post)
+        expect(store).to receive(:write_digests).with({})
+
+        expect(pull).to have_changes
+      end
+    end
+
     def expect_pull(params)
       params = params.dup
       local = params.delete(:local)

@@ -30,6 +30,10 @@ class Pressy::Site
       digests[id] = post.digest
     end
 
+    pull.changeset.deleted_posts.each_value do |post|
+      store.delete(post)
+    end
+
     store.write_digests(digests) if pull.has_changes?
 
     pull
