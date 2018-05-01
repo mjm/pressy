@@ -3,73 +3,74 @@ require 'spec_helper'
 Pull = Pressy::Action::Pull
 
 RSpec.describe Pressy::Action::Pull do
-  context "when there are no local posts or server posts" do
+  let(:changeset) { double(:changeset) }
+  before { allow(Pressy::LocalChangeset).to receive(:new) { changeset } }
+
+  context "when the changeset has no changes" do
     subject { Pull.new(local: [], server: []) }
-    
-    it "has no changes" do
-      expect(subject).not_to have_changes
-      expect(subject.changed_posts).to be_empty
-    end
-  end
 
-  context "when the local and server posts are the same" do
-    let(:local_posts) {
-      [rendered_post(path: 'standard/foo.md', content: '', digest: "abc")]
-    }
-    let(:parsed_local_post) { server_post(id: 1) }
-    let(:server_posts) { [server_post(id: 1)] }
-    let(:rendered_server_post) { rendered_post(digest: "abc") }
-
-    subject { Pull.new(local: local_posts, server: server_posts) }
-
-    before(:each) do
-      expect(Pressy::PostRenderer).to receive(:render).with(server_posts.first) { rendered_server_post }
-      expect(Pressy::PostParser).to receive(:parse).with(format: 'standard', content: '') { parsed_local_post }
+    before do
+      expect(changeset).to receive(:has_changes?) { false }
     end
 
     it "has no changes" do
       expect(subject).not_to have_changes
-      expect(subject.changed_posts).to be_empty
     end
   end
 
-  context "when the server has changed a local post" do
-    context "and the local post is not modified" do
-      let(:local_posts) {
-        [rendered_post(path: 'standard/foo.md', content: '', digest: "abc")]
-      }
-      let(:parsed_local_post) { server_post(id: 1) }
-      let(:server_posts) { [server_post(id: 1)] }
-      let(:rendered_server_post) { rendered_post(digest: "def") }
+  context "when the changeset has changes" do
+    subject { Pull.new(local: [], server: []) }
 
-      subject { Pull.new(local: local_posts, server: server_posts) }
-
-      before(:each) do
-        expect(Pressy::PostRenderer).to receive(:render).with(server_posts.first) { rendered_server_post }
-        expect(Pressy::PostParser).to receive(:parse).with(format: 'standard', content: '') { parsed_local_post }
-      end
-
-      it "has changes" do
-        expect(subject).to have_changes
-        expect(subject.changed_posts).to eq({1 => rendered_server_post})
-      end
-    end
-  end
-
-  context "when the server has added a new post" do
-    let(:local_posts) { [] }
-    let(:server_posts) { [server_post(id: 1)] }
-    let(:rendered_server_post) { rendered_post(digest: "def") }
-
-    subject { Pull.new(local: local_posts, server: server_posts) }
-
-    before(:each) do
-      expect(Pressy::PostRenderer).to receive(:render).with(server_posts.first) { rendered_server_post }
+    before do
+      expect(changeset).to receive(:has_changes?) { true }
     end
 
     it "has changes" do
       expect(subject).to have_changes
-      expect(subject.changed_posts).to eq({1 => rendered_server_post})
+    end
+  end
+
+  context "when there are no local posts or server posts" do
+    subject { Pull.new(local: [], server: []) }
+    
+    it "doesn't add any posts to the changeset" do
+      expect(changeset).not_to receive(:add_local_post)
+      expect(changeset).not_to receive(:add_server_post)
+      subject.changeset
+    end
+  end
+
+  context "when there are local posts" do
+    let(:local_post) { rendered_post(path: 'standard/foo.md', content: '') }
+    let(:parsed_local_post) { make_server_post(id: 1) }
+
+    subject { Pull.new(local: [local_post], server: []) }
+
+    before do
+      expect(Pressy::PostParser).to receive(:parse).with(format: 'standard', content: '') { parsed_local_post }
+    end
+
+    it "adds the local post to the changeset" do
+      expect(changeset).to receive(:add_local_post).with(1, local_post)
+      expect(changeset).not_to receive(:add_server_post)
+      subject.changeset
+    end
+  end
+
+  context "when there are server posts" do
+    let(:server_post) { make_server_post(id: 2) }
+    let(:rendered_server_post) { rendered_post }
+
+    subject { Pull.new(local: [], server: [server_post]) }
+
+    before do
+      expect(Pressy::PostRenderer).to receive(:render).with(server_post) { rendered_server_post }
+    end
+
+    it "adds the server post to the changeset" do
+      expect(changeset).not_to receive(:add_local_post)
+      expect(changeset).to receive(:add_server_post).with(2, rendered_server_post)
+      subject.changeset
     end
   end
 end
@@ -78,6 +79,6 @@ def rendered_post(params = {})
   instance_double("Pressy::RenderedPost", params)
 end
 
-def server_post(params = {})
+def make_server_post(params = {})
   instance_double("Wordpress::Post", params)
 end

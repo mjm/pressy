@@ -30,29 +30,17 @@ RSpec.describe Pressy::Site do
 
     context "when the site is empty" do
       it "has no changes" do
-        expect_pull local: [], server: [], has_changes?: false, changed_posts: {}
-        expect(store).not_to receive(:write)
-        expect(store).not_to receive(:write_digests)
-
-        expect(pull).not_to have_changes
-        expect(pull.changed_posts).to be_empty
-      end
-    end
-
-    context "when the site is up-to-date" do
-      it "has no changes" do
         expect_pull(
-          local: [double(:local_post)],
-          server: [double(:server_post)],
+          local: [],
+          server: [],
           has_changes?: false,
-          changed_posts: {},
+          changeset: make_changeset
         )
 
         expect(store).not_to receive(:write)
         expect(store).not_to receive(:write_digests)
 
         expect(pull).not_to have_changes
-        expect(pull.changed_posts).to be_empty
       end
     end
 
@@ -64,14 +52,13 @@ RSpec.describe Pressy::Site do
           local: [],
           server: [double(:server_post)],
           has_changes?: true,
-          changed_posts: {123 => new_post}
+          changeset: make_changeset(added_posts: { 123 => new_post })
         )
 
         expect(store).to receive(:write).with(new_post)
         expect(store).to receive(:write_digests).with({ 123 => "abcdefg" })
 
         expect(pull).to have_changes
-        expect(pull.changed_posts.count).to eq 1
       end
     end
 
@@ -84,7 +71,7 @@ RSpec.describe Pressy::Site do
           local: [],
           server: [double(:server_post1), double(:server_post2)],
           has_changes?: true,
-          changed_posts: {1 => post1, 2 => post2}
+          changeset: make_changeset(added_posts: {1 => post1}, updated_posts: {2 => post2})
         )
 
         expect(store).to receive(:write).with(post1)
@@ -110,6 +97,16 @@ RSpec.describe Pressy::Site do
       expect(Pressy::Action::Pull).to receive(:new).with(local: local, server: server) {
         double(:pull, params)
       }
+    end
+
+    CHANGESET_DEFAULTS = {
+      added_posts: {},
+      updated_posts: {},
+      deleted_posts: {}
+    }
+
+    def make_changeset(params = {})
+      double(:changeset, CHANGESET_DEFAULTS.merge(params))
     end
   end
 end

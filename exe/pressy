@@ -1,20 +1,30 @@
 #!/usr/bin/env ruby
 require "pressy"
 
-store = Pressy::Store::FileStore.new(Dir.pwd)
-site = Pressy::Site.new(store)
+def main
+  store = Pressy::Store::FileStore.new(Dir.pwd)
+  site = Pressy::Site.new(store)
 
-action = ARGV.shift
-raise "no action given" unless action
+  action = ARGV.shift
+  raise "no action given" unless action
 
-case action.to_sym
-when :pull
-  result = site.pull
-  if result.has_changes?
-    $stderr.puts "Updated #{result.changed_posts.count} posts."
+  case action.to_sym
+  when :pull
+    result = site.pull
+    print_local_changeset(result.changeset)
   else
-    $stderr.puts "Already up-to-date."
+    raise "unexpected action '#{action}'"
   end
-else
-  raise "unexpected action '#{action}'"
 end
+
+def print_local_changeset(changeset, io = $stderr)
+  if changeset.has_changes?
+    io.puts "Added #{changeset.added_posts.count} posts." unless changeset.added_posts.empty?
+    io.puts "Updated #{changeset.updated_posts.count} posts." unless changeset.updated_posts.empty?
+    io.puts "Deleted #{changeset.deleted_posts.count} posts." unless changeset.deleted_posts.empty?
+  else
+    io.puts "Already up-to-date."
+  end
+end
+
+main

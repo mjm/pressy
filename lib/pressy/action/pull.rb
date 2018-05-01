@@ -1,3 +1,5 @@
+require 'pressy/changeset'
+
 class Pressy::Action::Pull
   attr_reader :server_posts
 
@@ -7,41 +9,32 @@ class Pressy::Action::Pull
   end
 
   def has_changes?
-    !changed_posts.empty?
+    changeset.has_changes?
   end
 
-  def changed_posts
-    @changes ||= collect_changed_posts
+  def changeset
+    @changeset ||= build_changeset
   end
 
   private
 
-  def collect_changed_posts
-    local = parsed_local_posts
+  def build_changeset
+    changes = Pressy::LocalChangeset.new
 
-    changes = {}
-
-    server_posts_by_id.each_pair do |id, post|
-      local_post = local[id]
-      if local_post
-        rendered = Pressy::PostRenderer.render(post)
-        if rendered.digest != local_post.original.digest
-          changes[id] = rendered
-        end
-      else
-        changes[id] = Pressy::PostRenderer.render(post)
-      end
+    local_posts.each do |local_post|
+      changes.add_local_post(local_post.parsed.id, local_post.original)
     end
-    
+
+    server_posts.each do |post|
+      rendered = Pressy::PostRenderer.render(post)
+      changes.add_server_post(post.id, rendered)
+    end
+
     changes
   end
 
   def local_posts
     @local_posts.map {|post| LocalPost.new(post, parse_local_post(post)) }
-  end
-
-  def parsed_local_posts
-    local_posts.map {|p| [p.parsed.id, p]}.to_h
   end
 
   def parse_local_post(post)
@@ -50,10 +43,6 @@ class Pressy::Action::Pull
 
   def post_format(post)
     File.dirname(post.path)
-  end
-
-  def server_posts_by_id
-    server_posts.map {|p| [p.id, p]}.to_h
   end
 
   LocalPost = Struct.new(:original, :parsed)

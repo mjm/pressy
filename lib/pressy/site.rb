@@ -24,7 +24,8 @@ class Pressy::Site
     )
 
     digests = {}
-    pull.changed_posts.each_pair do |id, post|
+    posts = pull.changeset.added_posts.merge(pull.changeset.updated_posts)
+    posts.each_pair do |id, post|
       store.write(post)
       digests[id] = post.digest
     end
