@@ -1,7 +1,7 @@
-require 'wordpress'
+require 'pressy/client'
 require 'yaml'
 
-# PostParser transforms the contents of a rendered post into a Wordpress::Post.
+# PostParser transforms the contents of a rendered post into a Pressy::Post.
 class Pressy::PostParser
   # @return [String] the format of the post, derived from the directory the post is stored in
   attr_reader :format
@@ -18,10 +18,10 @@ class Pressy::PostParser
     @content = StringIO.new(@content) if @content.is_a? String
   end
 
-  # Parses the rendered post into a Wordpress::Post.
-  # @return [Wordpress::Post] The post parsed from the given content
+  # Parses the rendered post into a Pressy::Post.
+  # @return [Pressy::Post] The post parsed from the given content
   def parse
-    return Wordpress::Post.new("post_content" => "", "post_format" => format) if lines.empty?
+    return Pressy::Post.new("post_content" => "", "post_format" => format) if lines.empty?
 
     if lines.first.strip == "---"
       the_lines = lines.drop(1)
@@ -29,9 +29,9 @@ class Pressy::PostParser
       frontmatter_lines = the_lines[0...frontmatter_end_idx]
       params = parse_frontmatter(frontmatter_lines)
       content = the_lines[(frontmatter_end_idx + 1)..-1]
-      Wordpress::Post.new(params.merge("post_content" => content.join(""), "post_format" => format))
+      Pressy::Post.new(params.merge("post_content" => content.join(""), "post_format" => format))
     else
-      Wordpress::Post.new("post_content" => lines.join(""), "post_format" => format)
+      Pressy::Post.new("post_content" => lines.join(""), "post_format" => format)
     end
   end
 

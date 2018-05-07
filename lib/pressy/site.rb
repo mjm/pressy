@@ -1,10 +1,12 @@
+require 'pressy/client'
+
 # Site is a high-level interface for working with a WordPress site using Pressy.
 class Pressy::Site
   # The Store that is managing the local storage for this site.
   # @return [Store]
   attr_reader :store
   # The client that is being used to interact with the remote WordPress site.
-  # @return [Wordpress]
+  # @return [Pressy::Client]
   attr_reader :client
 
   # Creates a new Site backed by +store+.
@@ -44,7 +46,7 @@ class Pressy::Site
   private
 
   def create_client
-    @client = Wordpress.connect(site_configuration)
+    @client = Pressy::Client.connect(site_configuration)
   end
 
   def site_configuration

@@ -1,12 +1,12 @@
-require 'wordpress'
+require 'pressy/client'
 require 'yaml'
 require 'digest'
 
-# PostRenderer transforms a Wordpress::Post into a representation that can be
+# PostRenderer transforms a Pressy::Post into a representation that can be
 # written to a Store.
 class Pressy::PostRenderer
   # Creates a new post renderer.
-  # @param post [Wordpress::Post] The post to render
+  # @param post [Pressy::Post] The post to render
   def initialize(post)
     @post = post
   end

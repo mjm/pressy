@@ -37,7 +37,7 @@ RSpec.describe Pressy::PostsRenderer do
   end
 
   def make_standard_post(id, title, content, status="draft")
-    Wordpress::Post.new(
+    Pressy::Post.new(
       "post_id" => id,
       "post_title" => title,
       "post_content" => content,
@@ -47,7 +47,7 @@ RSpec.describe Pressy::PostsRenderer do
   end
 
   def make_status_post(id, content, status="draft")
-    Wordpress::Post.new(
+    Pressy::Post.new(
       "post_id" => id,
       "post_content" => content,
       "post_status" => status,

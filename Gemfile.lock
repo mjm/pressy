@@ -1,7 +1,9 @@
-PATH
-  remote: ../wordpress
+GIT
+  remote: https://github.com/mjm/pressy-client
+  revision: 36c8545512c969d58d1303e6618bd54d3beaece6
+  branch: master
   specs:
-    wordpress (0.1.0)
+    pressy-client (0.1.0)
       xmlrpc
 
 PATH
@@ -35,9 +37,9 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.16)
   pressy!
+  pressy-client!
   rake (~> 10.0)
   rspec (~> 3.0)
-  wordpress!
 
 BUNDLED WITH
    1.16.1

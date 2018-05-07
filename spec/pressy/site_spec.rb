@@ -11,17 +11,17 @@ RSpec.describe Pressy::Site do
       }
   end
   let(:store) { instance_double("Pressy::Store::FileStore") }
-  let(:wordpress) { instance_double("Wordpress") }
+  let(:wordpress) { instance_double("Pressy::Client") }
   subject(:site) { Pressy::Site.new(store) }
 
   before(:each) do
     allow(store).to receive(:configuration) { config }
-    allow(Wordpress).to receive(:connect) { wordpress }
+    allow(Pressy::Client).to receive(:connect) { wordpress }
   end
 
-  it "creates a new site with a configured Wordpress client" do
+  it "creates a new site with a configured client" do
     expected_config = { host: "example.com", username: "alex", password: "pressy" }
-    expect(Wordpress).to receive(:connect).with(expected_config) { wordpress }
+    expect(Pressy::Client).to receive(:connect).with(expected_config) { wordpress }
     Pressy::Site.new(store)
   end
 

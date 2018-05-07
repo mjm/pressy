@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Pressy::PostRenderer do
   let(:post) {
-    Wordpress::Post.new(
+    Pressy::Post.new(
       "post_id" => 123,
       "post_title" => "This is a post",
       "post_content" => %{This is my content. Isn't it cool},
@@ -12,7 +12,7 @@ RSpec.describe Pressy::PostRenderer do
     )
   }
   let(:status) {
-    Wordpress::Post.new(
+    Pressy::Post.new(
       "post_id" => 124,
       "post_title" => "",
       "post_content" => %{This is my status update #blessed},
@@ -51,7 +51,7 @@ CONTENT
 
   it "produces the same digest for the same post" do
     rendered_post = Pressy::PostRenderer.render(post)
-    rendered_post2 = Pressy::PostRenderer.render(Wordpress::Post.new(post.fields))
+    rendered_post2 = Pressy::PostRenderer.render(Pressy::Post.new(post.fields))
     expect(rendered_post.digest).to eq rendered_post2.digest
   end
 end
