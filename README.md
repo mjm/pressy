@@ -4,11 +4,16 @@ Pressy lets you work with your WordPress site as though you were using a static 
 
 ## Installation
 
+Pressy is a work-in-progress and is not yet published as a RubyGem.
+
+<!--
+
 You can install Pressy using RubyGems:
 
     $ gem install pressy
 
 This will install the `pressy` command-line tool.
+-->
 
 ## Usage
 
