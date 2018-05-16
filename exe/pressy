@@ -11,13 +11,16 @@ def main
   case action.to_sym
   when :pull
     result = site.pull
-    print_local_changeset(result.changeset)
+    print_changeset(result.changeset)
+  when :push
+    result = site.push
+    print_changeset(result.changeset)
   else
     raise "unexpected action '#{action}'"
   end
 end
 
-def print_local_changeset(changeset, io = $stderr)
+def print_changeset(changeset, io = $stderr)
   if changeset.has_changes?
     io.puts "Added #{changeset.added_posts.count} posts." unless changeset.added_posts.empty?
     io.puts "Updated #{changeset.updated_posts.count} posts." unless changeset.updated_posts.empty?
