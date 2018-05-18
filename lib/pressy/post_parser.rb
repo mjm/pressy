@@ -54,7 +54,17 @@ class Pressy::PostParser
     {
       "post_id" => frontmatter["id"],
       "post_title" => frontmatter["title"],
-      "post_status" => frontmatter["status"]
+      "post_status" => frontmatter["status"],
+      "post_date_gmt" => parse_timestamp(frontmatter["published_at"]),
+      "post_modified_gmt" => parse_timestamp(frontmatter["modified_at"]),
     }.compact
+  end
+
+  def parse_timestamp(str)
+    if str
+      Time.iso8601(str)
+    else
+      nil
+    end
   end
 end

@@ -8,7 +8,8 @@ RSpec.describe Pressy::PostRenderer do
       "post_content" => %{This is my content. Isn't it cool},
       "post_type" => "post",
       "post_status" => "publish",
-      "post_format" => "standard"
+      "post_format" => "standard",
+      "post_modified_gmt" => XMLRPC::DateTime.new(2018, 12, 25, 3, 3, 3),
     )
   }
   let(:status) {
@@ -30,10 +31,11 @@ RSpec.describe Pressy::PostRenderer do
 id: 123
 title: This is a post
 status: publish
+modified_at: '2018-12-25T03:03:03Z'
 ---
 This is my content. Isn't it cool
 CONTENT
-    expect(rendered_post.digest).to eq 'a3ba2cc9a4b22cd7632df3ff450d12e5a6ccbe3da4ac0dcdc054ce46f1ef67c9'
+    expect(rendered_post.digest).to eq '765031e0aa14a3bd45e21b8853c755bfd466634069c4473f0d0285dabdbbde3f'
   end
 
   it "renders a status post" do
@@ -43,10 +45,11 @@ CONTENT
 ---
 id: 124
 status: draft
+published_at: '2018-12-25T01:01:01Z'
 ---
 This is my status update #blessed
 CONTENT
-    expect(rendered_post.digest).to eq 'ee821faa47aec9f8d042495fef35297241d5abdc73aa0869931535f3a8d994c7'
+    expect(rendered_post.digest).to eq '8893ba1639d91b140d228f5d04d1605903072727578c57e007e26c0f17bec414'
   end
 
   it "produces the same digest for the same post" do

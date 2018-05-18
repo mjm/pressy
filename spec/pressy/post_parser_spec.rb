@@ -71,6 +71,8 @@ RSpec.describe Pressy::PostParser do
       id: 1234
       title: This is my post title
       status: publish
+      published_at: '2018-12-25T01:01:01Z'
+      modified_at: '2018-12-25T03:03:03Z'
       ---
       This is my post contents.
 
@@ -81,6 +83,8 @@ RSpec.describe Pressy::PostParser do
     expect(post.id).to eq 1234
     expect(post.title).to eq "This is my post title"
     expect(post.status).to eq "publish"
+    expect(post.published_at).to eq Time.utc(2018, 12, 25, 1, 1, 1)
+    expect(post.modified_at).to eq Time.utc(2018, 12, 25, 3, 3, 3)
     expect(post.format).to eq "standard"
     expect(post.content).to eq "This is my post contents.\n\nI really like blogging with Pressy!\n"
   end

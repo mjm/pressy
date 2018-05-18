@@ -1,6 +1,7 @@
 require 'pressy/client'
 require 'yaml'
 require 'digest'
+require 'time'
 
 # PostRenderer transforms a Pressy::Post into a representation that can be
 # written to a Store.
@@ -45,7 +46,9 @@ class Pressy::PostRenderer
     {
       "id" => @post.id,
       "title" => @post.title.empty? ? nil : @post.title,
-      "status" => @post.status
+      "status" => @post.status,
+      "published_at" => @post.published_at&.iso8601,
+      "modified_at" => @post.modified_at&.iso8601,
     }.compact
   end
 
