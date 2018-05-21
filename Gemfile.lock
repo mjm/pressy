@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/mjm/pressy-client
-  revision: b1345631a4c6b8f49716cb5cadac927ce6da75d6
+  revision: 82c14c39fad070144bff0f90a1c1545524e310c7
   branch: master
   specs:
     pressy-client (0.1.0)
