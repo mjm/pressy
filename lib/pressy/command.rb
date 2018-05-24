@@ -12,5 +12,7 @@ module Pressy::Command
   end
 end
 
+require 'pressy/command/runner'
+
 require 'pressy/command/pull'
 require 'pressy/command/push'

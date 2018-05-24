@@ -5,17 +5,12 @@ def main
   store = Pressy::Store::FileStore.new(Dir.pwd)
   site = Pressy::Site.new(store)
 
-  action = ARGV.shift
-  raise "no action given" unless action
+  action = ARGV.shift&.to_sym
 
-  case action.to_sym
-  when :pull
-    Pressy::Command::Pull.new(site, $stderr).run
-  when :push
-    Pressy::Command::Push.new(site, $stderr).run
-  else
-    raise "unexpected action '#{action}'"
-  end
+  runner = Pressy::Command::Runner.new(site, $stderr)
+  runner.register(Pressy::Command::Pull)
+  runner.register(Pressy::Command::Push)
+  runner.run(action)
 end
 
 main
