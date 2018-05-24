@@ -168,6 +168,28 @@ RSpec.describe Pressy::Site do
       end
     end
 
+    context "when the store has an edited post" do
+      let(:edited_post) { double(:edited_post) }
+      let(:updated_post) { double(:updated_post) }
+      let(:rendered_post) { double(:rendered_post) }
+      let(:server_post) { double(:server_post) }
+
+      it "updates the post on the server and updates the local copy" do
+        expect_push(
+          local: [edited_post],
+          server: [server_post],
+          has_changes?: true,
+          changeset: make_changeset(updated_posts: [edited_post])
+        )
+
+        expect(wordpress).to receive(:edit_post).with(edited_post) { updated_post }
+        expect(Pressy::PostRenderer).to receive(:render).with(updated_post) { rendered_post }
+        expect(store).to receive(:write).with(rendered_post)
+
+        expect(push).to have_changes
+      end
+    end
+
     def expect_push(params)
       params = params.dup
       local = params.delete(:local)
