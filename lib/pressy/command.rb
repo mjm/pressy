@@ -13,3 +13,4 @@ module Pressy::Command
 end
 
 require 'pressy/command/pull'
+require 'pressy/command/push'
