@@ -10,8 +10,7 @@ def main
 
   case action.to_sym
   when :pull
-    result = site.pull
-    print_changeset(result.changeset)
+    Pressy::Command::Pull.new(site, $stderr).run
   when :push
     result = site.push
     print_changeset(result.changeset)
