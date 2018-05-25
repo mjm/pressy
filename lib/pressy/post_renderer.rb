@@ -36,10 +36,7 @@ class Pressy::PostRenderer
   end
 
   def content
-    @content ||= <<~"CONTENT"
-      #{YAML.dump(metadata)}---
-      #{@post.content}
-      CONTENT
+    @content ||= "#{YAML.dump(metadata)}---\n#{@post.content}"
   end
 
   def metadata

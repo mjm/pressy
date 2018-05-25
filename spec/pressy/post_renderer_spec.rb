@@ -26,7 +26,7 @@ RSpec.describe Pressy::PostRenderer do
   it "renders a standard post" do
     rendered_post = Pressy::PostRenderer.render(post)
     expect(rendered_post.path).to eq "standard/this-is-a-post.md"
-    expect(rendered_post.content).to eq <<CONTENT
+    expect(rendered_post.content).to eq <<CONTENT.chomp
 ---
 id: 123
 title: This is a post
@@ -35,13 +35,13 @@ modified_at: '2018-12-25T03:03:03Z'
 ---
 This is my content. Isn't it cool
 CONTENT
-    expect(rendered_post.digest).to eq '765031e0aa14a3bd45e21b8853c755bfd466634069c4473f0d0285dabdbbde3f'
+    expect(rendered_post.digest).to eq 'bb04ca995fdd609710038ef4bbae6c0c17a318549743f2278e3b6395ef86e993'
   end
 
   it "renders a status post" do
     rendered_post = Pressy::PostRenderer.render(status)
     expect(rendered_post.path).to eq "status/2018-12-25-this-is-my-status-update.md"
-    expect(rendered_post.content).to eq <<CONTENT
+    expect(rendered_post.content).to eq <<CONTENT.chomp
 ---
 id: 124
 status: draft
@@ -49,7 +49,7 @@ published_at: '2018-12-25T01:01:01Z'
 ---
 This is my status update #blessed
 CONTENT
-    expect(rendered_post.digest).to eq '8893ba1639d91b140d228f5d04d1605903072727578c57e007e26c0f17bec414'
+    expect(rendered_post.digest).to eq '60d9efabdb56a98487094cb2b8d1f768d05872cc26992b6acc38dbda8237b7f7'
   end
 
   it "produces the same digest for the same post" do

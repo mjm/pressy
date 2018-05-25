@@ -62,6 +62,8 @@ RSpec.describe Pressy::PostParser do
     expect(post.title).to eq "Foo"
     expect(post.status).to eq "draft"
     expect(post.format).to eq "standard"
+    expect(post.published_at).to be_nil
+    expect(post.modified_at).to be_nil
     expect(post.content).to eq "This is my post content.\n"
   end
 

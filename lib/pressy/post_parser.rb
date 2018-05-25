@@ -52,7 +52,7 @@ class Pressy::PostParser
   def parse_frontmatter(lines)
     frontmatter = YAML.load(lines.join("")) || {}
     {
-      "post_id" => frontmatter["id"],
+      "post_id" => frontmatter["id"]&.to_s,
       "post_title" => frontmatter["title"],
       "post_status" => frontmatter["status"],
       "post_date_gmt" => parse_timestamp(frontmatter["published_at"]),
@@ -61,10 +61,6 @@ class Pressy::PostParser
   end
 
   def parse_timestamp(str)
-    if str
-      Time.iso8601(str)
-    else
-      nil
-    end
+    Pressy::Post.wp_timestamp(Time.iso8601(str)) if str
   end
 end
