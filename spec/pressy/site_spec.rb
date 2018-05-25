@@ -179,7 +179,7 @@ RSpec.describe Pressy::Site do
           local: [edited_post],
           server: [server_post],
           has_changes?: true,
-          changeset: make_changeset(updated_posts: [edited_post])
+          changeset: make_changeset(updated_posts: {1 => edited_post})
         )
 
         expect(wordpress).to receive(:edit_post).with(edited_post) { updated_post }

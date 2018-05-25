@@ -55,7 +55,7 @@ class Pressy::Site
       store.write(Pressy::PostRenderer.render(saved_post))
     end
 
-    push.changeset.updated_posts.each do |post|
+    push.changeset.updated_posts.each do |_, post|
       saved_post = client.edit_post(post)
       store.write(Pressy::PostRenderer.render(saved_post))
     end
