@@ -55,6 +55,10 @@ class Pressy::RemoteChangeset
       saved = client.create_post(post)
       rendered = Pressy::PostRenderer.render(saved)
       store.write(rendered)
+
+      if rendered_post.path != rendered.path
+        store.delete(rendered_post)
+      end
     end
 
     def type
@@ -78,6 +82,10 @@ class Pressy::RemoteChangeset
       saved = client.edit_post(post)
       rendered = Pressy::PostRenderer.render(saved)
       store.write(rendered)
+
+      if rendered_post.path != rendered.path
+        store.delete(rendered_post)
+      end
     end
 
     def type

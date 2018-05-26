@@ -76,10 +76,10 @@ RSpec.describe Pressy::RemoteChangeset do
     let(:store) { double(:store) }
 
     describe Pressy::RemoteChangeset::AddedPost do
-      let(:draft_post) { double(:draft_post) }
+      let(:draft_post) { double(:draft_post, path: "foo/bar.md") }
       let(:new_post) { double(:new_post) }
       let(:saved_post) { double(:saved_post) }
-      let(:rendered_saved_post) { double(:rendered_saved_post) }
+      let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/bar.md") }
 
       subject { Pressy::RemoteChangeset::AddedPost.new(draft_post, new_post) }
 
@@ -93,13 +93,25 @@ RSpec.describe Pressy::RemoteChangeset do
         expect(store).to receive(:write).with(rendered_saved_post)
         subject.execute(store, client)
       end
+
+      context "when the filename of the post has changed" do
+        let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/baz.md") }
+
+        it "also deletes the older file from a store" do
+          expect(client).to receive(:create_post).with(new_post) { saved_post }
+          expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
+          expect(store).to receive(:write).with(rendered_saved_post)
+          expect(store).to receive(:delete).with(draft_post)
+          subject.execute(store, client)
+        end
+      end
     end
 
     describe Pressy::RemoteChangeset::UpdatedPost do
-      let(:draft_post) { double(:draft_post) }
+      let(:draft_post) { double(:draft_post, path: "foo/bar.md") }
       let(:post) { double(:post) }
       let(:saved_post) { double(:saved_post) }
-      let(:rendered_saved_post) { double(:rendered_saved_post) }
+      let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/bar.md") }
 
       subject { Pressy::RemoteChangeset::UpdatedPost.new(draft_post, post) }
 
@@ -112,6 +124,18 @@ RSpec.describe Pressy::RemoteChangeset do
         expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
         expect(store).to receive(:write).with(rendered_saved_post)
         subject.execute(store, client)
+      end
+
+      context "when the filename of the post has changed" do
+        let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/baz.md") }
+
+        it "also deletes the older file from the store" do
+          expect(client).to receive(:edit_post).with(post) { saved_post }
+          expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
+          expect(store).to receive(:write).with(rendered_saved_post)
+          expect(store).to receive(:delete).with(draft_post)
+          subject.execute(store, client)
+        end
       end
     end
   end
