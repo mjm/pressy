@@ -33,9 +33,14 @@ RSpec.describe PullCommand do
     let(:changeset) {
       instance_double("Pressy::LocalChangeset", {
         has_changes?: true,
-        added_posts: [double, double],
-        updated_posts: [double],
-        deleted_posts: [double, double, double]
+        changes: [
+          double(type: :add),
+          double(type: :add),
+          double(type: :update),
+          double(type: :delete),
+          double(type: :delete),
+          double(type: :delete),
+        ]
       })
     }
 

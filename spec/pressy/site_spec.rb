@@ -26,105 +26,25 @@ RSpec.describe Pressy::Site do
   end
 
   describe "pulling changes" do
+    let(:local_posts) { [double(:local1), double(:local2)] }
+    let(:server_posts) { [double(:server1), double(:server2)] }
+    let(:changeset) { double(:changeset, has_changes?: true, changes: [change1, change2]) }
+    let(:action) { double(:pull, has_changes?: true, changeset: changeset) }
+
+    let(:change1) { double(:change1) }
+    let(:change2) { double(:change2) }
+
     subject(:pull) { site.pull }
 
-    context "when the site is empty" do
-      it "has no changes" do
-        expect_pull(
-          local: [],
-          server: [],
-          has_changes?: false,
-          changeset: make_changeset
-        )
+    it "executes all of the changes in the changeset" do
+      expect(store).to receive(:all_posts) { local_posts }
+      expect(wordpress).to receive(:fetch_posts) { server_posts }
+      expect(Pressy::Action::Pull).to receive(:new).with(local: local_posts, server: server_posts) { action }
 
-        expect(store).not_to receive(:write)
-        expect(store).not_to receive(:write_digests)
+      expect(change1).to receive(:execute).with(store)
+      expect(change2).to receive(:execute).with(store)
 
-        expect(pull).not_to have_changes
-      end
-    end
-
-    context "when the site has a new post" do
-      let(:new_post) { double(:new_post, digest: "abcdefg") }
-
-      it "writes the changes to the store" do
-        expect_pull(
-          local: [],
-          server: [double(:server_post)],
-          has_changes?: true,
-          changeset: make_changeset(added_posts: { 123 => new_post })
-        )
-
-        expect(store).to receive(:write).with(new_post)
-        expect(store).to receive(:write_digests).with({ 123 => "abcdefg" })
-
-        expect(pull).to have_changes
-      end
-    end
-
-    context "when the site has multiple changed posts" do
-      let(:post1) { double(:post1, digest: "abc") }
-      let(:post2) { double(:post2, digest: "def") }
-
-      it "writes the changes to the store" do
-        expect_pull(
-          local: [],
-          server: [double(:server_post1), double(:server_post2)],
-          has_changes?: true,
-          changeset: make_changeset(added_posts: {1 => post1}, updated_posts: {2 => post2})
-        )
-
-        expect(store).to receive(:write).with(post1)
-        expect(store).to receive(:write).with(post2)
-
-        expect(store).to receive(:write_digests).with({
-          1 => "abc",
-          2 => "def",
-        })
-
-        expect(site.pull).to have_changes
-      end
-    end
-
-    context "when the site has deleted a post" do
-      let(:deleted_post) { double(:deleted_post) }
-
-      it "deletes the post from the store" do
-        expect_pull(
-          local: [double(:local_post)],
-          server: [],
-          has_changes?: true,
-          changeset: make_changeset(deleted_posts: {1 => deleted_post})
-        )
-
-        expect(store).to receive(:delete).with(deleted_post)
-        expect(store).to receive(:write_digests).with({})
-
-        expect(pull).to have_changes
-      end
-    end
-
-    def expect_pull(params)
-      params = params.dup
-      local = params.delete(:local)
-      server = params.delete(:server)
-
-      expect(store).to receive(:all_posts) { local }
-      expect(wordpress).to receive(:fetch_posts) { server }
-
-      expect(Pressy::Action::Pull).to receive(:new).with(local: local, server: server) {
-        double(:pull, params)
-      }
-    end
-
-    PULL_CHANGESET_DEFAULTS = {
-      added_posts: {},
-      updated_posts: {},
-      deleted_posts: {}
-    }
-
-    def make_changeset(params = {})
-      double(:changeset, PULL_CHANGESET_DEFAULTS.merge(params))
+      expect(pull).to have_changes
     end
   end
 

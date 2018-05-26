@@ -6,18 +6,7 @@ RSpec.describe Pressy::LocalChangeset do
 
     it "has no changes" do
       expect(subject).not_to have_changes
-    end
-
-    it "has no added posts" do
-      expect(subject.added_posts).to be_empty
-    end
-
-    it "has no updated posts" do
-      expect(subject.updated_posts).to be_empty
-    end
-
-    it "has no deleted posts" do
-      expect(subject.deleted_posts).to be_empty
+      expect(subject.changes).to be_empty
     end
   end
 
@@ -29,42 +18,23 @@ RSpec.describe Pressy::LocalChangeset do
       changes.add_server_post(123, new_post)
     end
 
-    it "has changes" do
-      expect(subject).to have_changes
-    end
-
     it "has an added post" do
-      expect(subject.added_posts).to eq({ 123 => new_post })
-    end
-
-    it "has no updated posts" do
-      expect(subject.updated_posts).to be_empty
-    end
-
-    it "has no deleted posts" do
-      expect(subject.deleted_posts).to be_empty
+      expect(subject).to have_changes
+      expect(subject.changes).to eq [
+        Pressy::LocalChangeset::AddedPost.new(new_post)
+      ]
     end
   end
 
   context "a changeset with one deleted post" do
     let(:deleted_post) { double(:post, digest: "abc") }
-
     subject { Pressy::LocalChangeset.new.add_local_post(123, deleted_post) }
 
-    it "has changes" do
-      expect(subject).to have_changes
-    end
-
-    it "has no added posts" do
-      expect(subject.added_posts).to be_empty
-    end
-
-    it "has no updated posts" do
-      expect(subject.updated_posts).to be_empty
-    end
-
     it "has a deleted post" do
-      expect(subject.deleted_posts).to eq({ 123 => deleted_post })
+      expect(subject).to have_changes
+      expect(subject.changes).to eq [
+        Pressy::LocalChangeset::DeletedPost.new(deleted_post)
+      ]
     end
   end
 
@@ -79,18 +49,7 @@ RSpec.describe Pressy::LocalChangeset do
 
     it "has no changes" do
       expect(subject).not_to have_changes
-    end
-
-    it "has no added posts" do
-      expect(subject.added_posts).to be_empty
-    end
-
-    it "has no updated posts" do
-      expect(subject.updated_posts).to be_empty
-    end
-
-    it "has no deleted posts" do
-      expect(subject.deleted_posts).to be_empty
+      expect(subject.changes).to eq []
     end
   end
 
@@ -104,22 +63,11 @@ RSpec.describe Pressy::LocalChangeset do
         .add_server_post(123, server_post)
     }
 
-    it "has changes" do
-      expect(subject).to have_changes
-    end
-
-    it "has no added posts" do
-      expect(subject.added_posts).to be_empty
-    end
-
     it "has an updated post" do
-      # TODO this should probably return something that includes the original post
-      # that way we can move the post if the filename changed
-      expect(subject.updated_posts).to eq({ 123 => server_post })
-    end
-
-    it "has no deleted posts" do
-      expect(subject.deleted_posts).to be_empty
+      expect(subject).to have_changes
+      expect(subject.changes).to eq [
+        Pressy::LocalChangeset::UpdatedPost.new(local_post, server_post)
+      ]
     end
   end
 
@@ -133,27 +81,65 @@ RSpec.describe Pressy::LocalChangeset do
 
     it "has no changes" do
       expect(subject).not_to have_changes
-    end
-
-    it "has no added posts" do
-      expect(subject.added_posts).to be_empty
-    end
-
-    it "has no updated posts" do
-      expect(subject.updated_posts).to be_empty
-    end
-
-    it "has no deleted posts" do
-      expect(subject.deleted_posts).to be_empty
+      expect(subject.changes).to eq []
     end
   end
 
   it "updates the diff results when posts are added" do
-    changes = Pressy::LocalChangeset.new
-    expect(changes.added_posts).to be_empty
-    changes.add_server_post(123, double(:post, digest: "abc"))
-    expect(changes.added_posts).not_to be_empty
-    changes.add_local_post(123, double(:post, digest: "abc"))
-    expect(changes.added_posts).to be_empty
+    subject = Pressy::LocalChangeset.new
+    expect(subject.changes).to be_empty
+    subject.add_server_post(123, double(:post, digest: "abc"))
+    expect(subject.changes).not_to be_empty
+    subject.add_local_post(123, double(:post, digest: "abc"))
+    expect(subject.changes).to be_empty
+  end
+
+  describe "change types" do
+    let(:store) { double(:store) }
+
+    describe Pressy::LocalChangeset::AddedPost do
+      let(:post) { double(:rendered_post) }
+      subject { Pressy::LocalChangeset::AddedPost.new(post) }
+
+      it "has type 'add'" do
+        expect(subject.type).to be :add
+      end
+
+      it "writes the post to a store" do
+        expect(store).to receive(:write).with(post)
+        subject.execute(store)
+      end
+    end
+
+    describe Pressy::LocalChangeset::UpdatedPost do
+      let(:existing_post) { double(:existing_post, filename: "foo/bar.md") }
+      let(:updated_post) { double(:updated_post, filename: "foo/bar.md") }
+      subject { Pressy::LocalChangeset::UpdatedPost.new(existing_post, updated_post) }
+
+      it "has type 'update'" do
+        expect(subject.type).to be :update
+      end
+
+      context "when the filenames of the posts match" do
+        it "writes the post to a store" do
+          expect(store).to receive(:write).with(updated_post)
+          subject.execute(store)
+        end
+      end
+    end
+
+    describe Pressy::LocalChangeset::DeletedPost do
+      let(:post) { double(:rendered_post) }
+      subject { Pressy::LocalChangeset::DeletedPost.new(post) }
+
+      it "has type 'delete'" do
+        expect(subject.type).to be :delete
+      end
+
+      it "deletes the post from a store" do
+        expect(store).to receive(:delete).with(post)
+        subject.execute(store)
+      end
+    end
   end
 end

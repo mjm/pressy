@@ -25,18 +25,9 @@ class Pressy::Site
       server: fetch_server_posts
     )
 
-    digests = {}
-    posts = pull.changeset.added_posts.merge(pull.changeset.updated_posts)
-    posts.each_pair do |id, post|
-      store.write(post)
-      digests[id] = post.digest
+    pull.changeset.changes.each do |change|
+      change.execute(store)
     end
-
-    pull.changeset.deleted_posts.each_value do |post|
-      store.delete(post)
-    end
-
-    store.write_digests(digests) if pull.has_changes?
 
     pull
   end

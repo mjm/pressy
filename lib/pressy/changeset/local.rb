@@ -19,7 +19,7 @@ class Pressy::LocalChangeset
   # @return [self] the updated changeset
   def add_server_post(id, post)
     @server_posts[id] = post
-    @diff = nil
+    @changes = nil
     self
   end
 
@@ -38,7 +38,7 @@ class Pressy::LocalChangeset
     return self unless id
 
     @local_posts[id] = post
-    @diff = nil
+    @changes = nil
     self
   end
 
@@ -48,44 +48,99 @@ class Pressy::LocalChangeset
   # Checks if there are differences present in the changeset.
   # @return [Boolean] true if there are any differences between the local and server posts
   def has_changes?
-    !(diff.added.empty? && diff.updated.empty? && diff.deleted.empty?)
+    !changes.empty?
   end
 
-  # @return [Hash{Fixnum => Pressy::RenderedPost}]
-  #   a list of posts to create in the store
-  def added_posts
-    diff.added
-  end
-
-  # @return [Hash{Fixnum => Pressy::RenderedPost}]
-  #   a list of posts to update in the store
-  def updated_posts
-    diff.updated
-  end
-
-  # @return [Hash{Fixnum => Pressy::RenderedPost}]
-  #   a list of posts to remove from the store
-  def deleted_posts
-    diff.deleted
+  # @return [Array<AddedPost, UpdatedPost, DeletedPost>]
+  #   a list of changes to apply to the store
+  def changes
+    @changes ||= build_changes
   end
 
   # @!endgroup
-  
+
   private
 
-  def diff
-    @diff ||= build_diff
+  def build_changes
+    added_posts + updated_posts + deleted_posts
   end
 
-  def build_diff
-    added = @server_posts.reject {|id, post| @local_posts.has_key? id }
-    updated = @server_posts
+  def added_posts
+    @server_posts
+      .reject {|id, post| @local_posts.has_key? id }
+      .map {|id, post| AddedPost.new(post) }
+  end
+
+  def updated_posts
+    @server_posts
       .select {|id, post| @local_posts[id] && @local_posts[id].digest != post.digest }
-    deleted = @local_posts.reject {|id, post| @server_posts.has_key? id }
-
-    Diff.new(added, updated, deleted)
+      .map {|id, post| UpdatedPost.new(@local_posts[id], post) }
   end
 
-  # @api private
-  Diff = Struct.new(:added, :updated, :deleted)
+  def deleted_posts
+    @local_posts
+      .reject {|id, post| @server_posts.has_key? id }
+      .map {|id, post| DeletedPost.new(post) }
+  end
+
+  class AddedPost
+    attr_reader :post
+
+    def initialize(post)
+      @post = post
+    end
+
+    def execute(store)
+      store.write(post)
+    end
+
+    def type
+      :add
+    end
+
+    def ==(other)
+      post == other.post
+    end
+  end
+
+  class UpdatedPost
+    attr_reader :existing_post, :updated_post
+
+    def initialize(existing, updated)
+      @existing_post = existing
+      @updated_post = updated
+    end
+
+    def execute(store)
+      store.write(updated_post)
+    end
+
+    def type
+      :update
+    end
+
+    def ==(other)
+      existing_post == other.existing_post && updated_post == other.updated_post
+    end
+  end
+
+  class DeletedPost
+    attr_reader :post
+
+    def initialize(post)
+      @post = post
+    end
+
+    def execute(store)
+      store.delete(post)
+    end
+
+    def type
+      :delete
+    end
+
+    def ==(other)
+      post == other.post
+    end
+  end
 end
