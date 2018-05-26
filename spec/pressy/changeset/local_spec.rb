@@ -112,8 +112,8 @@ RSpec.describe Pressy::LocalChangeset do
     end
 
     describe Pressy::LocalChangeset::UpdatedPost do
-      let(:existing_post) { double(:existing_post, filename: "foo/bar.md") }
-      let(:updated_post) { double(:updated_post, filename: "foo/bar.md") }
+      let(:existing_post) { double(:existing_post, path: "foo/bar.md") }
+      let(:updated_post) { double(:updated_post, path: "foo/bar.md") }
       subject { Pressy::LocalChangeset::UpdatedPost.new(existing_post, updated_post) }
 
       it "has type 'update'" do
@@ -123,6 +123,16 @@ RSpec.describe Pressy::LocalChangeset do
       context "when the filenames of the posts match" do
         it "writes the post to a store" do
           expect(store).to receive(:write).with(updated_post)
+          subject.execute(store)
+        end
+      end
+
+      context "when the filenames of the posts no longer match" do
+        let(:updated_post) { double(:updated_post, path: "foo/baz.md") }
+
+        it "write the post to a store and deletes the old post" do
+          expect(store).to receive(:write).with(updated_post)
+          expect(store).to receive(:delete).with(existing_post)
           subject.execute(store)
         end
       end

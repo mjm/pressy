@@ -113,6 +113,10 @@ class Pressy::LocalChangeset
 
     def execute(store)
       store.write(updated_post)
+
+      if existing_post.path != updated_post.path
+        store.delete(existing_post)
+      end
     end
 
     def type
