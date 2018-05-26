@@ -19,8 +19,8 @@ class Pressy::Action::Push
   def build_changeset
     changeset = Pressy::RemoteChangeset.new
 
-    local_posts.each do |post|
-      changeset.add_local_post(post)
+    local_posts.each do |rendered, post|
+      changeset.add_local_post(rendered, post)
     end
 
     @server_posts.each do |post|
@@ -31,7 +31,7 @@ class Pressy::Action::Push
   end
 
   def local_posts
-    @local_posts.map {|post| parse_local_post(post) }
+    @local_posts.map {|post| [post, parse_local_post(post)] }
   end
 
   def parse_local_post(post)

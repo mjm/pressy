@@ -5,11 +5,11 @@ class Pressy::RemoteChangeset
     @server_posts = {}
   end
 
-  def add_local_post(post)
+  def add_local_post(rendered_post, post)
     if post.id
-      @local_posts[post.id] = post
+      @local_posts[post.id] = [rendered_post, post]
     else
-      @added_posts << post
+      @added_posts << [rendered_post, post]
     end
     self
   end
@@ -20,33 +20,72 @@ class Pressy::RemoteChangeset
   end
 
   def has_changes?
-    !(added_posts.empty? && updated_posts.empty? && deleted_posts.empty?)
+    !changes.empty?
   end
 
-  def added_posts
-    diff.added
-  end
-
-  def updated_posts
-    diff.updated
-  end
-
-  def deleted_posts
-    diff.deleted
+  def changes
+    @changes ||= build_changes
   end
 
   private
 
-  def diff
-    @diff ||= build_diff
+  def build_changes
+    added_posts + updated_posts
   end
 
-  def build_diff
-    updated_posts = @local_posts.select { |id, post| @server_posts.has_key?(id) && post != @server_posts[id] }
-
-    Diff.new(@added_posts, updated_posts, {})
+  def added_posts
+    @added_posts.map {|rendered,post| AddedPost.new(rendered, post) }
   end
 
-  # @api private
-  Diff = Struct.new(:added, :updated, :deleted)
+  def updated_posts
+    @local_posts
+      .select {|id, post| @server_posts.has_key?(id) && post[1] != @server_posts[id] }
+      .map {|id, post| UpdatedPost.new(*post) }
+  end
+
+  class AddedPost
+    attr_reader :rendered_post, :post
+
+    def initialize(rendered_post, post)
+      @rendered_post = rendered_post
+      @post = post
+    end
+
+    def execute(store, client)
+      saved = client.create_post(post)
+      rendered = Pressy::PostRenderer.render(saved)
+      store.write(rendered)
+    end
+
+    def type
+      :add
+    end
+
+    def ==(other)
+      rendered_post == other.rendered_post && post == other.post
+    end
+  end
+
+  class UpdatedPost
+    attr_reader :rendered_post, :post
+
+    def initialize(rendered_post, post)
+      @rendered_post = rendered_post
+      @post = post
+    end
+
+    def execute(store, client)
+      saved = client.edit_post(post)
+      rendered = Pressy::PostRenderer.render(saved)
+      store.write(rendered)
+    end
+
+    def type
+      :update
+    end
+
+    def ==(other)
+      rendered_post == other.rendered_post && post == other.post
+    end
+  end
 end

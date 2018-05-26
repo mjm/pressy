@@ -39,16 +39,8 @@ class Pressy::Site
       server: fetch_server_posts
     )
 
-    push.changeset.added_posts.each do |post|
-      saved_post = client.create_post(post)
-      # Calling the renderer here feels kinda like a layering violation, but the other layers
-      # won't have the Client, so they wouldn't be able to provide us the already rendered post
-      store.write(Pressy::PostRenderer.render(saved_post))
-    end
-
-    push.changeset.updated_posts.each do |_, post|
-      saved_post = client.edit_post(post)
-      store.write(Pressy::PostRenderer.render(saved_post))
+    push.changeset.changes.each do |change|
+      change.execute(store, client)
     end
 
     push

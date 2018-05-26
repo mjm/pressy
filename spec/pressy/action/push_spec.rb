@@ -51,7 +51,7 @@ RSpec.describe Push do
     end
 
     it "adds the local post to the changeset" do
-      expect(changeset).to receive(:add_local_post).with(parsed_local_post)
+      expect(changeset).to receive(:add_local_post).with(local_post, parsed_local_post)
       expect(changeset).not_to receive(:add_server_post)
       subject.changeset
     end
