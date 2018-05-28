@@ -93,8 +93,7 @@ RSpec.describe Pressy::Store::FileStore do
 
   context "deleting posts" do
     it "deletes a post that exists" do
-      post_to_delete = example_store.all_posts.first
-      expect(post_to_delete.content).to include("id: 1")
+      post_to_delete = example_store.all_posts.detect {|p| p.content.include? "id: 1" }
 
       example_store.delete(1, post_to_delete)
 
