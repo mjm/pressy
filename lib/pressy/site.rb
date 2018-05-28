@@ -66,13 +66,3 @@ class Pressy::Site
     client.fetch_posts.to_a
   end
 end
-
-class Pressy::PullResult
-  def initialize(pull)
-    @has_changes = pull.has_changes?
-  end
-
-  def has_changes?
-    @has_changes
-  end
-end
