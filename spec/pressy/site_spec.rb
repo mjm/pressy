@@ -25,6 +25,14 @@ RSpec.describe Pressy::Site do
     Pressy::Site.new(store)
   end
 
+  context "when the store does not have a site configuration" do
+    let(:config) { {} }
+
+    it "raises an error indicating there is no site configuration" do
+      expect { site }.to raise_error("no site configuration found in this directory")
+    end
+  end
+
   describe "pulling changes" do
     let(:local_posts) { [double(:local1), double(:local2)] }
     let(:server_posts) { [double(:server1), double(:server2)] }

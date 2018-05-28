@@ -55,7 +55,7 @@ class Pressy::Site
   end
 
   def site_configuration
-    store.configuration["site"].transform_keys(&:to_sym)
+    store.configuration["site"]&.transform_keys(&:to_sym) or raise "no site configuration found in this directory"
   end
 
   def fetch_local_posts
