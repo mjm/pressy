@@ -54,11 +54,12 @@ class Pressy::RemoteChangeset
     def execute(store, client)
       saved = client.create_post(post)
       rendered = Pressy::PostRenderer.render(saved)
-      store.write(rendered)
 
       if rendered_post.path != rendered.path
-        store.delete(rendered_post)
+        store.delete(saved.id, rendered_post)
       end
+
+      store.write(saved.id, rendered)
     end
 
     def type
@@ -81,11 +82,12 @@ class Pressy::RemoteChangeset
     def execute(store, client)
       saved = client.edit_post(post)
       rendered = Pressy::PostRenderer.render(saved)
-      store.write(rendered)
 
       if rendered_post.path != rendered.path
-        store.delete(rendered_post)
+        store.delete(saved.id, rendered_post)
       end
+
+      store.write(saved.id, rendered)
     end
 
     def type

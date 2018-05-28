@@ -78,7 +78,7 @@ RSpec.describe Pressy::RemoteChangeset do
     describe Pressy::RemoteChangeset::AddedPost do
       let(:draft_post) { double(:draft_post, path: "foo/bar.md") }
       let(:new_post) { double(:new_post) }
-      let(:saved_post) { double(:saved_post) }
+      let(:saved_post) { double(:saved_post, id: 123) }
       let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/bar.md") }
 
       subject { Pressy::RemoteChangeset::AddedPost.new(draft_post, new_post) }
@@ -90,7 +90,7 @@ RSpec.describe Pressy::RemoteChangeset do
       it "creates the post and writes the updated version to a store" do
         expect(client).to receive(:create_post).with(new_post) { saved_post }
         expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
-        expect(store).to receive(:write).with(rendered_saved_post)
+        expect(store).to receive(:write).with(123, rendered_saved_post)
         subject.execute(store, client)
       end
 
@@ -100,8 +100,11 @@ RSpec.describe Pressy::RemoteChangeset do
         it "also deletes the older file from a store" do
           expect(client).to receive(:create_post).with(new_post) { saved_post }
           expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
-          expect(store).to receive(:write).with(rendered_saved_post)
-          expect(store).to receive(:delete).with(draft_post)
+
+          # order matters here because the delete will remove the digest
+          expect(store).to receive(:delete).with(123, draft_post).ordered
+          expect(store).to receive(:write).with(123, rendered_saved_post).ordered
+
           subject.execute(store, client)
         end
       end
@@ -109,8 +112,8 @@ RSpec.describe Pressy::RemoteChangeset do
 
     describe Pressy::RemoteChangeset::UpdatedPost do
       let(:draft_post) { double(:draft_post, path: "foo/bar.md") }
-      let(:post) { double(:post) }
-      let(:saved_post) { double(:saved_post) }
+      let(:post) { double(:post, id: 123) }
+      let(:saved_post) { double(:saved_post, id: 123) }
       let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/bar.md") }
 
       subject { Pressy::RemoteChangeset::UpdatedPost.new(draft_post, post) }
@@ -122,7 +125,7 @@ RSpec.describe Pressy::RemoteChangeset do
       it "edits the post and writes the updated version to a store" do
         expect(client).to receive(:edit_post).with(post) { saved_post }
         expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
-        expect(store).to receive(:write).with(rendered_saved_post)
+        expect(store).to receive(:write).with(123, rendered_saved_post)
         subject.execute(store, client)
       end
 
@@ -132,8 +135,11 @@ RSpec.describe Pressy::RemoteChangeset do
         it "also deletes the older file from the store" do
           expect(client).to receive(:edit_post).with(post) { saved_post }
           expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
-          expect(store).to receive(:write).with(rendered_saved_post)
-          expect(store).to receive(:delete).with(draft_post)
+
+          # order matters here because delete will remove the digest
+          expect(store).to receive(:delete).with(123, draft_post).ordered
+          expect(store).to receive(:write).with(123, rendered_saved_post).ordered
+
           subject.execute(store, client)
         end
       end

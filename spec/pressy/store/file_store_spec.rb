@@ -44,10 +44,14 @@ RSpec.describe Pressy::Store::FileStore do
       ---
       This is some post content.
       CONTENT
-      empty_store.write(post)
+      empty_store.write(1, post)
 
       posts = empty_store.all_posts
       expect(posts).to eql [post]
+
+      expect(empty_store.digests).to eq({
+        1 => "593a3da32f58aa12f944c2e65d82aeae5282c47edb0e2fe01976039ed823a36b"
+      })
     end
 
     it "overwrites a post that already exists" do
@@ -60,7 +64,7 @@ RSpec.describe Pressy::Store::FileStore do
       ---
       Oh no I deleted all the stuff in this post.
       CONTENT
-      example_store.write(post)
+      example_store.write(4, post)
 
       posts = example_store.all_posts.sort_by(&:path)
       expect(posts.count).to be 4
@@ -77,15 +81,29 @@ RSpec.describe Pressy::Store::FileStore do
         "d3723b47c2a83e688c094f427a25bbe25166c608ec2e1a03f19b4ed8d7bcd4af",
         "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
       ]
+
+      expect(example_store.digests).to eq({
+        4 => digest,
+        3 => "8d198fd679f2cc0631c10b72aabc54b41c73d9ebbcef2f8405707a83b317652e",
+        1 => "d3723b47c2a83e688c094f427a25bbe25166c608ec2e1a03f19b4ed8d7bcd4af",
+        2 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9",
+      })
     end
   end
 
   context "deleting posts" do
     it "deletes a post that exists" do
       post_to_delete = example_store.all_posts.first
-      example_store.delete(post_to_delete)
+      expect(post_to_delete.content).to include("id: 1")
+
+      example_store.delete(1, post_to_delete)
 
       expect(example_store.all_posts.count).to be 3
+      expect(example_store.digests).to eq({
+        4 => "46944d16c3ffdfa9d03a09dba9b42d873bc66b30c14d8a4b200499071d633a99",
+        3 => "8d198fd679f2cc0631c10b72aabc54b41c73d9ebbcef2f8405707a83b317652e",
+        2 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
+      })
     end
   end
 
@@ -101,26 +119,6 @@ RSpec.describe Pressy::Store::FileStore do
         1 => "d3723b47c2a83e688c094f427a25bbe25166c608ec2e1a03f19b4ed8d7bcd4af",
         2 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
       })
-    end
-  end
-
-  context "writing cached digests" do
-    it "writes successfully if there is no digests file" do
-      digests = {
-        1 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
-      }
-      empty_store.write_digests(digests)
-
-      expect(empty_store.digests).to eq digests
-    end
-
-    it "overwrites the existing digests if a file already exists" do
-      digests = {
-        1 => "296534ec795162c278e1b2a588cd68c192cef0a8a6d6fd5999cfd9bf7d5ffaf9"
-      }
-      example_store.write_digests(digests)
-
-      expect(example_store.digests).to eq digests
     end
   end
 

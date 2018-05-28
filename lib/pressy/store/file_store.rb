@@ -26,29 +26,33 @@ class Pressy::Store::FileStore
   end
 
   # Writes a rendered post to disk.
+  # @param id [Fixnum] the ID of the post being written. This is used
+  #   to update the cached digests for detecting conflicts.
   # @param post [Pressy::RenderedPost] the post to write
-  def write(post)
+  def write(id, post)
     path = post_path(post)
     create_parent_directory path
     File.write(path, post.content)
+
+    update_digests do |digests|
+      digests[id] = post.digest
+    end
   end
 
   # Deletes a post from disk.
+  # @param id [Fixnum] the ID of the post being deleted.
   # @param post [Pressy::RenderedPost] the post to delete
-  def delete(post)
+  def delete(id, post)
     File.unlink(post_path(post))
+
+    update_digests do |digests|
+      digests.delete(id)
+    end
   end
 
   # @return [Hash] the saved digests for each post, by ID
   def digests
     YAML.load_file(digests_path) rescue {}
-  end
-
-  # Writes new digests for the site's posts to disk.
-  # @param digests [Hash] the complete mapping from post ID to digest
-  def write_digests(digests)
-    create_parent_directory digests_path
-    File.write(digests_path, YAML.dump(digests))
   end
 
   # @return [Hash] the saved configuration of the site
@@ -57,6 +61,15 @@ class Pressy::Store::FileStore
   end
 
   private
+
+  def update_digests
+    create_parent_directory digests_path
+
+    # this is not very efficient, especially if we are updating a lot of posts.
+    digests = self.digests
+    yield digests
+    File.write(digests_path, YAML.dump(digests))
+  end
 
   def post_path(post)
     File.join(root, post.path)

@@ -68,30 +68,31 @@ class Pressy::LocalChangeset
   def added_posts
     @server_posts
       .reject {|id, post| @local_posts.has_key? id }
-      .map {|id, post| AddedPost.new(post) }
+      .map {|id, post| AddedPost.new(id, post) }
   end
 
   def updated_posts
     @server_posts
       .select {|id, post| @local_posts[id] && @local_posts[id].digest != post.digest }
-      .map {|id, post| UpdatedPost.new(@local_posts[id], post) }
+      .map {|id, post| UpdatedPost.new(id, @local_posts[id], post) }
   end
 
   def deleted_posts
     @local_posts
       .reject {|id, post| @server_posts.has_key? id }
-      .map {|id, post| DeletedPost.new(post) }
+      .map {|id, post| DeletedPost.new(id, post) }
   end
 
   class AddedPost
-    attr_reader :post
+    attr_reader :id, :post
 
-    def initialize(post)
+    def initialize(id, post)
+      @id = id
       @post = post
     end
 
     def execute(store)
-      store.write(post)
+      store.write(id, post)
     end
 
     def type
@@ -99,24 +100,25 @@ class Pressy::LocalChangeset
     end
 
     def ==(other)
-      post == other.post
+      id == other.id && post == other.post
     end
   end
 
   class UpdatedPost
-    attr_reader :existing_post, :updated_post
+    attr_reader :id, :existing_post, :updated_post
 
-    def initialize(existing, updated)
+    def initialize(id, existing, updated)
+      @id = id
       @existing_post = existing
       @updated_post = updated
     end
 
     def execute(store)
-      store.write(updated_post)
-
       if existing_post.path != updated_post.path
-        store.delete(existing_post)
+        store.delete(id, existing_post)
       end
+
+      store.write(id, updated_post)
     end
 
     def type
@@ -129,14 +131,15 @@ class Pressy::LocalChangeset
   end
 
   class DeletedPost
-    attr_reader :post
+    attr_reader :id, :post
 
-    def initialize(post)
+    def initialize(id, post)
+      @id = id
       @post = post
     end
 
     def execute(store)
-      store.delete(post)
+      store.delete(id, post)
     end
 
     def type

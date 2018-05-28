@@ -21,7 +21,7 @@ RSpec.describe Pressy::LocalChangeset do
     it "has an added post" do
       expect(subject).to have_changes
       expect(subject.changes).to eq [
-        Pressy::LocalChangeset::AddedPost.new(new_post)
+        Pressy::LocalChangeset::AddedPost.new(123, new_post)
       ]
     end
   end
@@ -33,7 +33,7 @@ RSpec.describe Pressy::LocalChangeset do
     it "has a deleted post" do
       expect(subject).to have_changes
       expect(subject.changes).to eq [
-        Pressy::LocalChangeset::DeletedPost.new(deleted_post)
+        Pressy::LocalChangeset::DeletedPost.new(123, deleted_post)
       ]
     end
   end
@@ -66,7 +66,7 @@ RSpec.describe Pressy::LocalChangeset do
     it "has an updated post" do
       expect(subject).to have_changes
       expect(subject.changes).to eq [
-        Pressy::LocalChangeset::UpdatedPost.new(local_post, server_post)
+        Pressy::LocalChangeset::UpdatedPost.new(123, local_post, server_post)
       ]
     end
   end
@@ -99,14 +99,14 @@ RSpec.describe Pressy::LocalChangeset do
 
     describe Pressy::LocalChangeset::AddedPost do
       let(:post) { double(:rendered_post) }
-      subject { Pressy::LocalChangeset::AddedPost.new(post) }
+      subject { Pressy::LocalChangeset::AddedPost.new(123, post) }
 
       it "has type 'add'" do
         expect(subject.type).to be :add
       end
 
       it "writes the post to a store" do
-        expect(store).to receive(:write).with(post)
+        expect(store).to receive(:write).with(123, post)
         subject.execute(store)
       end
     end
@@ -114,7 +114,7 @@ RSpec.describe Pressy::LocalChangeset do
     describe Pressy::LocalChangeset::UpdatedPost do
       let(:existing_post) { double(:existing_post, path: "foo/bar.md") }
       let(:updated_post) { double(:updated_post, path: "foo/bar.md") }
-      subject { Pressy::LocalChangeset::UpdatedPost.new(existing_post, updated_post) }
+      subject { Pressy::LocalChangeset::UpdatedPost.new(123, existing_post, updated_post) }
 
       it "has type 'update'" do
         expect(subject.type).to be :update
@@ -122,7 +122,7 @@ RSpec.describe Pressy::LocalChangeset do
 
       context "when the filenames of the posts match" do
         it "writes the post to a store" do
-          expect(store).to receive(:write).with(updated_post)
+          expect(store).to receive(:write).with(123, updated_post)
           subject.execute(store)
         end
       end
@@ -131,8 +131,10 @@ RSpec.describe Pressy::LocalChangeset do
         let(:updated_post) { double(:updated_post, path: "foo/baz.md") }
 
         it "write the post to a store and deletes the old post" do
-          expect(store).to receive(:write).with(updated_post)
-          expect(store).to receive(:delete).with(existing_post)
+          # order matters because delete will remove the digest
+          expect(store).to receive(:delete).with(123, existing_post).ordered
+          expect(store).to receive(:write).with(123, updated_post).ordered
+
           subject.execute(store)
         end
       end
@@ -140,14 +142,14 @@ RSpec.describe Pressy::LocalChangeset do
 
     describe Pressy::LocalChangeset::DeletedPost do
       let(:post) { double(:rendered_post) }
-      subject { Pressy::LocalChangeset::DeletedPost.new(post) }
+      subject { Pressy::LocalChangeset::DeletedPost.new(123, post) }
 
       it "has type 'delete'" do
         expect(subject.type).to be :delete
       end
 
       it "deletes the post from a store" do
-        expect(store).to receive(:delete).with(post)
+        expect(store).to receive(:delete).with(123, post)
         subject.execute(store)
       end
     end
