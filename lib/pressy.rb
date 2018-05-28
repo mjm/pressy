@@ -6,6 +6,7 @@ end
 require "pressy/action"
 require "pressy/changeset"
 require "pressy/command"
+require "pressy/console"
 require "pressy/post_parser"
 require "pressy/post_renderer"
 require "pressy/site"

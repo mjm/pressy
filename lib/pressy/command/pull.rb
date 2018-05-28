@@ -5,12 +5,12 @@ class Pressy::Command::Pull
     :pull
   end
 
-  def initialize(site, stderr)
+  def initialize(site, console)
     @site = site
-    @stderr = stderr
+    @console = console
   end
 
   def run
-    print_changeset(@site.pull.changeset, @stderr)
+    print_changeset(@site.pull.changeset, @console)
   end
 end

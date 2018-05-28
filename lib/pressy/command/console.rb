@@ -5,7 +5,7 @@ class Pressy::Command::Console
     :console
   end
 
-  def initialize(site, _stderr)
+  def initialize(site, _console)
     @site = site
   end
 

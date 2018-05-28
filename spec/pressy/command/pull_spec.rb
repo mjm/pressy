@@ -4,11 +4,12 @@ PullCommand = Pressy::Command::Pull
 
 RSpec.describe PullCommand do
   let(:stderr) { StringIO.new }
+  let(:console) { double(:console, error: stderr) }
   let(:changeset) { instance_double("Pressy::LocalChangeset") }
   let(:pull) { double(:pull, changeset: changeset) }
   let(:site) { instance_double("Pressy::Site") }
 
-  subject { PullCommand.new(site, stderr) }
+  subject { PullCommand.new(site, console) }
 
   before do
     allow(site).to receive(:pull) { pull }

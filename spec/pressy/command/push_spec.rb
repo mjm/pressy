@@ -4,11 +4,12 @@ PushCommand = Pressy::Command::Push
 
 RSpec.describe PushCommand do
   let(:stderr) { StringIO.new }
+  let(:console) { double(:console, error: stderr) }
   let(:changeset) { instance_double("Pressy::RemoteChangeset") }
   let(:push) { double(:push, changeset: changeset) }
   let(:site) { instance_double("Pressy::Site") }
 
-  subject { PushCommand.new(site, stderr) }
+  subject { PushCommand.new(site, console) }
 
   before do
     allow(site).to receive(:push) { push }

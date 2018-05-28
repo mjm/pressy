@@ -5,12 +5,12 @@ class Pressy::Command::Push
     :push
   end
 
-  def initialize(site, stderr)
+  def initialize(site, console)
     @site = site
-    @stderr = stderr
+    @console = console
   end
 
   def run
-    print_changeset(@site.push.changeset, @stderr)
+    print_changeset(@site.push.changeset, @console)
   end
 end
