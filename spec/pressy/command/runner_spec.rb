@@ -32,6 +32,11 @@ RSpec.describe Pressy::Command::Runner do
         expect(push.instance).not_to receive(:run)
         subject.run(:pull)
       end
+
+      it "passes arguments down to the command" do
+        expect(pull.instance).to receive(:run).with("a", "b")
+        subject.run(:pull, "a", "b")
+      end
     end
 
     context "when the command is not registered" do

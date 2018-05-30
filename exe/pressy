@@ -11,7 +11,7 @@ def main
   runner.register(Pressy::Command::Console)
   runner.register(Pressy::Command::Pull)
   runner.register(Pressy::Command::Push)
-  runner.run(action)
+  runner.run(action, *ARGV)
 end
 
 main

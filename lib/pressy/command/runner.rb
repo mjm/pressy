@@ -9,10 +9,10 @@ class Pressy::Command::Runner
     @commands[type.name] = type
   end
 
-  def run(action)
+  def run(action, *args)
     raise "no action given" unless action
 
     command_type = @commands[action] or raise "unexpected action '#{action.to_s}'"
-    command_type.new(@site, @stderr).run
+    command_type.new(@site, @stderr).run(*args)
   end
 end
