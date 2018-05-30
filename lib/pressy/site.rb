@@ -49,6 +49,23 @@ class Pressy::Site
     push
   end
 
+  def clone(params = {})
+    uri = URI.parse(params.fetch(:url))
+
+    site_config = {
+      "host" => uri.host,
+      "username" => params.fetch(:username),
+      "password" => params.fetch(:password)
+    }
+
+    if uri.path != "" && uri.path != "/"
+      # using File.join for this is sketchy but URI is very bad at joining
+      site_config["path"] = File.join(uri.path, "xmlrpc.php")
+    end
+
+    store.create(params[:path] || uri.host, { "site" => site_config })
+  end
+
   # @!endgroup
 
   private

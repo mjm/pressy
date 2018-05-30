@@ -82,4 +82,60 @@ RSpec.describe Pressy::Site do
       expect(push).to have_changes
     end
   end
+
+  describe "cloning" do
+    let(:user) { "john" }
+    let(:password) { "password" }
+
+    it "clones to an explicitly specified directory" do
+      expect(store).to receive(:create).with("foo", {
+        "site" => {
+          "host" => "example.com",
+          "username" => user,
+          "password" => password
+        }
+      })
+
+      site.clone(
+        url: "https://example.com/",
+        username: user,
+        password: password,
+        path: "foo"
+      )
+    end
+
+    it "clones to an implicitly named directory based off the hostname" do
+      expect(store).to receive(:create).with("example.com", {
+        "site" => {
+          "host" => "example.com",
+          "username" => user,
+          "password" => password
+        }
+      })
+
+      site.clone(
+        url: "https://example.com",
+        path: nil,
+        username: user,
+        password: password,
+      )
+    end
+
+    it "correctly configures for a site hosted at a subpath" do
+      expect(store).to receive(:create).with("example.com", {
+        "site" => {
+          "host" => "example.com",
+          "path" => "/foo/bar/xmlrpc.php",
+          "username" => user,
+          "password" => password
+        }
+      })
+
+      site.clone(
+        url: "https://example.com/foo/bar",
+        username: user,
+        password: password,
+      )
+    end
+  end
 end

@@ -17,6 +17,7 @@ end
 
 require 'pressy/command/runner'
 
+require 'pressy/command/clone'
 require 'pressy/command/console'
 require 'pressy/command/pull'
 require 'pressy/command/push'
