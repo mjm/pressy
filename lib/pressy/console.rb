@@ -1,3 +1,5 @@
+require 'io/console'
+
 class Pressy::Console
   attr_reader :input, :output, :error
 
@@ -7,8 +9,9 @@ class Pressy::Console
     @error = error
   end
 
-  def prompt(label)
+  def prompt(label, echo: true)
     error.print "#{label} "
-    input.gets.chomp
+    value = echo ? input.gets : input.noecho(&:gets)
+    value.chomp
   end
 end

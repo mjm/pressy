@@ -15,11 +15,24 @@ RSpec.describe Pressy::Console do
     expect(subject.error).to be $stderr
   end
 
-  it "can prompt for a line of input" do
-    expect($stderr).to receive(:print).with("What's your name? ")
-    expect($stdin).to receive(:gets) { "None of your business\n" }
+  describe "prompting for input" do
+    it "prompts for a line of input" do
+      expect($stderr).to receive(:print).with("What's your name? ")
+      expect($stdin).to receive(:gets) { "None of your business\n" }
 
-    name = subject.prompt("What's your name?")
-    expect(name).to eq "None of your business"
+      name = subject.prompt("What's your name?")
+      expect(name).to eq "None of your business"
+    end
+
+    let(:noecho) { double(:noecho) }
+
+    it "prompts for input with echoing disabled" do
+      expect($stderr).to receive(:print).with("What's your name? ")
+      expect($stdin).to receive(:noecho).and_yield(noecho)
+      expect(noecho).to receive(:gets) { "None of your business\n" }
+
+      name = subject.prompt("What's your name?", echo: false)
+      expect(name).to eq "None of your business"
+    end
   end
 end
