@@ -135,6 +135,30 @@ RSpec.describe Pressy::Store::FileStore do
     end
   end
 
+  describe "creating a new store" do
+    context "relative to an existing store" do
+      subject { Pressy::Store::FileStore.new(tmpdir) }
+
+      it "creates a store with a relative path" do
+        new_store = subject.create("foo/bar")
+        expect(new_store.root).to eq File.join(tmpdir, "foo", "bar")
+        expect(Pathname.new(new_store.root)).to exist
+      end
+
+      it "creates a store with an absolute path" do
+        new_store = subject.create(File.join(tmpdir, "foo"))
+        expect(new_store.root).to eq File.join(tmpdir, "foo")
+        expect(Pathname.new(new_store.root)).to exist
+      end
+
+      it "creates a store with preloaded configuration" do
+        config = {"site" => {"host" => "example.com"}}
+        new_store = subject.create("foo/bar", config)
+        expect(new_store.configuration).to eq config
+      end
+    end
+  end
+
   def store(name)
     Pressy::Store::FileStore.new(copy_store(name))
   end

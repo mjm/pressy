@@ -1,3 +1,5 @@
+require 'pathname'
+
 # FileStore is the default Store for Pressy sites.
 #
 # FileStore saves each post as a file on disk. It also creates a +.pressy+ folder
@@ -58,6 +60,23 @@ class Pressy::Store::FileStore
   # @return [Hash] the saved configuration of the site
   def configuration
     YAML.load_file(configuration_path) rescue {}
+  end
+
+  def configuration=(config)
+    create_parent_directory configuration_path
+    File.write(configuration_path, YAML.dump(config))
+  end
+
+  def create(path, config = {})
+    path = Pathname.new(path).relative? ? File.join(root, path) : path
+    self.class.create(path, config)
+  end
+
+  def self.create(path, config = {})
+    FileUtils.mkdir_p path
+    store = self.new(path)
+    store.configuration = config
+    store
   end
 
   private
