@@ -22,14 +22,18 @@ RSpec.describe Pressy::Site do
   it "creates a new site with a configured client" do
     expected_config = { host: "example.com", username: "alex", password: "pressy" }
     expect(Pressy::Client).to receive(:connect).with(expected_config) { wordpress }
-    Pressy::Site.new(store)
+    Pressy::Site.new(store).client
   end
 
   context "when the store does not have a site configuration" do
     let(:config) { {} }
 
-    it "raises an error indicating there is no site configuration" do
-      expect { site }.to raise_error("no site configuration found in this directory")
+    it "can be initialized" do
+      expect { site }.not_to raise_error
+    end
+
+    it "raises an error when trying to use the client" do
+      expect { site.client }.to raise_error("no site configuration found in this directory")
     end
   end
 

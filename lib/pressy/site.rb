@@ -5,15 +5,18 @@ class Pressy::Site
   # The Store that is managing the local storage for this site.
   # @return [Store]
   attr_reader :store
-  # The client that is being used to interact with the remote WordPress site.
-  # @return [Pressy::Client]
-  attr_reader :client
 
   # Creates a new Site backed by +store+.
-  # Uses the configuration provided by +store+ to create a WordPress client.
+  # Uses the configuration provided by +store+ to create a WordPress client
+  # when needed.
   def initialize(store)
     @store = store
-    create_client
+  end
+
+  # The client that is being used to interact with the remote WordPress site.
+  # @return [Pressy::Client]
+  def client
+    @client ||= create_client
   end
 
   # @!group Actions
