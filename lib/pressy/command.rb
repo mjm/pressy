@@ -1,4 +1,23 @@
 module Pressy::Command
+  def self.define(command_name, &definition)
+    class_name = command_name.capitalize
+    command_class = Class.new(&definition)
+    self.const_set(class_name, command_class)
+    command_class.class_eval %{
+      def self.name
+        #{command_name.inspect}
+      end
+    }
+    command_class.include Pressy::Command
+  end
+
+  def initialize(site, console)
+    @site = site
+    @console = console
+  end
+
+  attr_reader :site, :console
+
   module ChangesetHelpers
     def print_changeset(changeset, console)
       if changeset.has_changes?
