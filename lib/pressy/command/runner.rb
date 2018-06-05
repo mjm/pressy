@@ -1,7 +1,7 @@
 class Pressy::Command::Runner
-  def initialize(site, stderr)
+  def initialize(site, console)
     @site = site
-    @stderr = stderr
+    @console = console
     @commands = {}
   end
 
@@ -13,6 +13,6 @@ class Pressy::Command::Runner
     raise "no action given" unless action
 
     command_type = @commands[action] or raise "unexpected action '#{action.to_s}'"
-    command_type.new(@site, @stderr).run(*args)
+    command_type.new(@site, @console).run(*args)
   end
 end
