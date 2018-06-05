@@ -18,17 +18,29 @@ module Pressy::Command
 
   attr_reader :site, :console
 
+  def stdin
+    console.input
+  end
+
+  def stdout
+    console.output
+  end
+
+  def stderr
+    console.error
+  end
+
   module ChangesetHelpers
-    def print_changeset(changeset, console)
+    def print_changeset(changeset)
       if changeset.has_changes?
         added = changeset.changes.count {|c| c.type == :add }
         updated = changeset.changes.count {|c| c.type == :update }
         deleted = changeset.changes.count {|c| c.type == :delete }
-        console.error.puts "Added #{added} posts." unless added == 0
-        console.error.puts "Updated #{updated} posts." unless updated == 0
-        console.error.puts "Deleted #{deleted} posts." unless deleted == 0
+        stderr.puts "Added #{added} posts." unless added == 0
+        stderr.puts "Updated #{updated} posts." unless updated == 0
+        stderr.puts "Deleted #{deleted} posts." unless deleted == 0
       else
-        console.error.puts "Already up-to-date."
+        stderr.puts "Already up-to-date."
       end
     end
   end

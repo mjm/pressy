@@ -6,12 +6,12 @@ Pressy::Command.define :clone do
 
     username = console.prompt("Username:")
     password = console.prompt("Password:", echo: false)
-    console.error.puts
+    stderr.puts
 
     new_site = site.create(url: url, path: directory, username: username, password: password)
-    console.error.puts "Created new site in #{new_site.root}."
+    stderr.puts "Created new site in #{new_site.root}."
 
     pull = new_site.pull
-    print_changeset pull.changeset, @console
+    print_changeset pull.changeset
   end
 end
