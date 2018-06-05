@@ -8,7 +8,8 @@ module Pressy::Command
         #{command_name.inspect}
       end
     }
-    command_class.include Pressy::Command
+    command_class.include self
+    Registry.default.register(command_class)
   end
 
   def initialize(site, console)
@@ -46,6 +47,7 @@ module Pressy::Command
   end
 end
 
+require 'pressy/command/registry'
 require 'pressy/command/runner'
 
 require 'pressy/command/clone'

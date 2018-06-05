@@ -2,58 +2,45 @@ require 'spec_helper'
 
 RSpec.describe Pressy::Command::Runner do
   let(:site) { double(:site) }
-  let(:stderr) { double(:stderr) }
-  subject { Pressy::Command::Runner.new(site, stderr) }
+  let(:console) { double(:console) }
+  let(:registry) { instance_double("Pressy::Command::Registry") }
+  subject { Pressy::Command::Runner.new(registry, site, console) }
 
   describe "running commands" do
+    let(:command_type) { double(:command_type) }
+    let(:command) { double(:command) }
+
     context "when no command is provided" do
       it "raises an error" do
         expect { subject.run(nil) }.to raise_error("no action given")
       end
     end
 
-    context "when there are no command registered" do
-      it "raises an error when running any command" do
-        expect { subject.run(:pull) }.to raise_error("unexpected action 'pull'")
-      end
-    end
-
     context "when the command is registered" do
-      let(:pull) { make_command(:pull) }
-      let(:push) { make_command(:push) }
-
       before do
-        subject.register(pull)
-        subject.register(push)
+        expect(registry).to receive(:lookup).with(:pull) { command_type }
+        expect(command_type).to receive(:new).with(site, console) { command }
       end
 
       it "runs the matching command" do
-        expect(pull.instance).to receive(:run)
-        expect(push.instance).not_to receive(:run)
+        expect(command).to receive(:run)
         subject.run(:pull)
       end
 
       it "passes arguments down to the command" do
-        expect(pull.instance).to receive(:run).with("a", "b")
+        expect(command).to receive(:run).with("a", "b")
         subject.run(:pull, "a", "b")
       end
     end
 
     context "when the command is not registered" do
       before do
-        subject.register(double(name: :push))
+        expect(registry).to receive(:lookup).with(:pull) { nil }
       end
 
       it "raises an error" do
         expect { subject.run(:pull) }.to raise_error("unexpected action 'pull'")
       end
     end
-  end
-
-  def make_command(name)
-    instance = double(:"#{name}_instance")
-    command = double(name: name, instance: instance)
-    allow(command).to receive(:new).with(site, stderr) { instance }
-    command
   end
 end

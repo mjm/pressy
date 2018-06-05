@@ -23,4 +23,9 @@ RSpec.shared_examples "command" do |name|
   it "has command name '#{name}'" do
     expect(described_class.name).to be name
   end
+
+  it "is registered in the default command registry" do
+    registry = Pressy::Command::Registry.default
+    expect(registry.lookup(name)).to be described_class
+  end
 end

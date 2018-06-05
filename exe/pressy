@@ -4,14 +4,11 @@ require "pressy"
 def main
   store = Pressy::Store::FileStore.new(Dir.pwd)
   site = Pressy::Site.new(store)
+  registry = Pressy::Command::Registry.default
 
   action = ARGV.shift&.to_sym
 
-  runner = Pressy::Command::Runner.new(site, Pressy::Console.new)
-  runner.register(Pressy::Command::Clone)
-  runner.register(Pressy::Command::Console)
-  runner.register(Pressy::Command::Pull)
-  runner.register(Pressy::Command::Push)
+  runner = Pressy::Command::Runner.new(registry, site, Pressy::Console.new)
   runner.run(action, *ARGV)
 end
 
