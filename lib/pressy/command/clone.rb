@@ -1,4 +1,6 @@
 class Pressy::Command::Clone
+  include Pressy::Command::ChangesetHelpers
+
   def self.name
     :clone
   end
@@ -13,7 +15,12 @@ class Pressy::Command::Clone
 
     username = @console.prompt("Username:")
     password = @console.prompt("Password:", echo: false)
+    @console.error.puts
 
-    @site.clone(url: url, path: directory, username: username, password: password)
+    new_site = @site.create(url: url, path: directory, username: username, password: password)
+    @console.error.puts "Created new site in #{new_site.root}."
+
+    pull = new_site.pull
+    print_changeset pull.changeset, @console
   end
 end

@@ -37,6 +37,11 @@ RSpec.describe Pressy::Site do
     end
   end
 
+  it "has a root directory that delegates to the store" do
+    expect(store).to receive(:root) { "/foo/bar" }
+    expect(site.root).to eq "/foo/bar"
+  end
+
   describe "pulling changes" do
     let(:local_posts) { [double(:local1), double(:local2)] }
     let(:server_posts) { [double(:server1), double(:server2)] }
@@ -83,42 +88,45 @@ RSpec.describe Pressy::Site do
     end
   end
 
-  describe "cloning" do
+  describe "creating a new site" do
     let(:user) { "john" }
     let(:password) { "password" }
+    let(:new_store) { double(:new_store) }
 
-    it "clones to an explicitly specified directory" do
+    it "creates in an explicitly specified directory" do
       expect(store).to receive(:create).with("foo", {
         "site" => {
           "host" => "example.com",
           "username" => user,
           "password" => password
         }
-      })
+      }) { new_store }
 
-      site.clone(
+      new_site = site.create(
         url: "https://example.com/",
         username: user,
         password: password,
         path: "foo"
       )
+      expect(new_site.store).to be new_store
     end
 
-    it "clones to an implicitly named directory based off the hostname" do
+    it "creates in an implicitly named directory based off the hostname" do
       expect(store).to receive(:create).with("example.com", {
         "site" => {
           "host" => "example.com",
           "username" => user,
           "password" => password
         }
-      })
+      }) { new_store }
 
-      site.clone(
+      new_site = site.create(
         url: "https://example.com",
         path: nil,
         username: user,
         password: password,
       )
+      expect(new_site.store).to be new_store
     end
 
     it "correctly configures for a site hosted at a subpath" do
@@ -129,13 +137,14 @@ RSpec.describe Pressy::Site do
           "username" => user,
           "password" => password
         }
-      })
+      }) { new_store }
 
-      site.clone(
+      new_site = site.create(
         url: "https://example.com/foo/bar",
         username: user,
         password: password,
       )
+      expect(new_site.store).to be new_store
     end
   end
 end

@@ -19,6 +19,10 @@ class Pressy::Site
     @client ||= create_client
   end
 
+  def root
+    store.root
+  end
+
   # @!group Actions
 
   # Checks for changes on the server and updates the files on disk to match.
@@ -49,7 +53,7 @@ class Pressy::Site
     push
   end
 
-  def clone(params = {})
+  def create(params = {})
     uri = URI.parse(params.fetch(:url))
 
     site_config = {
@@ -63,7 +67,8 @@ class Pressy::Site
       site_config["path"] = File.join(uri.path, "xmlrpc.php")
     end
 
-    store.create(params[:path] || uri.host, { "site" => site_config })
+    new_store = store.create(params[:path] || uri.host, { "site" => site_config })
+    Pressy::Site.new(new_store)
   end
 
   # @!endgroup
