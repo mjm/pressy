@@ -2,8 +2,7 @@
 require "pressy"
 
 def main
-  store = Pressy::Store::FileStore.new(Dir.pwd)
-  site = Pressy::Site.new(store)
+  site = Pressy::Site.current
   registry = Pressy::Command::Registry.default
 
   action = ARGV.shift&.to_sym

@@ -159,6 +159,10 @@ RSpec.describe Pressy::Store::FileStore do
     end
   end
 
+  it "has a current store rooted in the current directory" do
+    expect(Pressy::Store::FileStore.current.root).to eq Dir.pwd
+  end
+
   def store(name)
     Pressy::Store::FileStore.new(copy_store(name))
   end

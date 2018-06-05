@@ -72,6 +72,10 @@ class Pressy::Site
   end
 
   # @!endgroup
+  
+  def self.current
+    self.new(Pressy::Store::FileStore.current)
+  end
 
   private
 

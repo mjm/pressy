@@ -79,6 +79,10 @@ class Pressy::Store::FileStore
     store
   end
 
+  def self.current
+    self.new(Dir.pwd)
+  end
+
   private
 
   def update_digests

@@ -147,4 +147,9 @@ RSpec.describe Pressy::Site do
       expect(new_site.store).to be new_store
     end
   end
+
+  it "has a default site for the current file store" do
+    expect(Pressy::Store::FileStore).to receive(:current) { store }
+    expect(Pressy::Site.current.store).to be store
+  end
 end
