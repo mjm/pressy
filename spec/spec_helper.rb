@@ -12,3 +12,15 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+RSpec.shared_examples "command" do |name|
+  let(:stderr) { StringIO.new }
+  let(:console) { instance_double("Pressy::Console", error: stderr) }
+  let(:site) { instance_double("Pressy::Site") }
+
+  subject { described_class.new(site, console) }
+
+  it "has command name '#{name}'" do
+    expect(described_class.name).to be name
+  end
+end

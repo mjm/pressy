@@ -1,22 +1,13 @@
 require 'spec_helper'
 
-PullCommand = Pressy::Command::Pull
+RSpec.describe Pressy::Command::Pull do
+  include_examples "command", :pull
 
-RSpec.describe PullCommand do
-  let(:stderr) { StringIO.new }
-  let(:console) { double(:console, error: stderr) }
   let(:changeset) { instance_double("Pressy::LocalChangeset") }
   let(:pull) { double(:pull, changeset: changeset) }
-  let(:site) { instance_double("Pressy::Site") }
-
-  subject { PullCommand.new(site, console) }
 
   before do
     allow(site).to receive(:pull) { pull }
-  end
-
-  it "has command name 'pull'" do
-    expect(PullCommand.name).to be :pull
   end
 
   context "when the site has no changes" do

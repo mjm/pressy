@@ -1,16 +1,7 @@
 require 'spec_helper'
 
-CloneCommand = Pressy::Command::Clone
-
-RSpec.describe CloneCommand do
-  let(:stderr) { StringIO.new }
-  let(:site) { double(:site) }
-  let(:console) { double(:console, error: stderr) }
-  subject { CloneCommand.new(site, console) }
-
-  it "has command name 'clone'" do
-    expect(CloneCommand.name).to be :clone
-  end
+RSpec.describe Pressy::Command::Clone do
+  include_examples "command", :clone
 
   context "when no site URL is provided" do
     it "raises an error" do

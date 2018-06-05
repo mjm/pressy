@@ -1,22 +1,13 @@
 require 'spec_helper'
 
-PushCommand = Pressy::Command::Push
+RSpec.describe Pressy::Command::Push do
+  include_examples "command", :push
 
-RSpec.describe PushCommand do
-  let(:stderr) { StringIO.new }
-  let(:console) { double(:console, error: stderr) }
   let(:changeset) { instance_double("Pressy::RemoteChangeset") }
   let(:push) { double(:push, changeset: changeset) }
-  let(:site) { instance_double("Pressy::Site") }
-
-  subject { PushCommand.new(site, console) }
 
   before do
     allow(site).to receive(:push) { push }
-  end
-
-  it "has command name 'push'" do
-    expect(PushCommand.name).to be :push
   end
 
   context "when the site has no changes" do
