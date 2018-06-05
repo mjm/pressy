@@ -90,4 +90,9 @@ Foo bar
     generator = Pressy::PostFilenameGenerator.new("Foo bar baz", "Whatever", date)
     expect(generator.filename).to eq "2018-01-01-foo-bar-baz.md"
   end
+
+  it "generates a filename with Markdown link URLs stripped out" do
+    generator = Pressy::PostFilenameGenerator.new("", "I [saw a bird](https://example.com/this/is/a/bird) on the street the other day.")
+    expect(generator.filename).to eq "i-saw-a-bird-on.md"
+  end
 end

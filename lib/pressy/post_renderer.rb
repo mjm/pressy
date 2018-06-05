@@ -83,12 +83,13 @@ class Pressy::PostFilenameGenerator
   end
 
   HTML_TAGS = /<\/?[^>]*>/
+  LINK_URLS = %r{\[(.+)\]\(.+\)}
   CHARACTERS_TO_STRIP = %r{[^a-z0-9 ]}
   SPACES = %r{\s+}
 
   def content_components
     content_lines
-      .map {|s| s.gsub(CHARACTERS_TO_STRIP, '') }
+      .map {|s| s.gsub(LINK_URLS, '\1').gsub(CHARACTERS_TO_STRIP, '') }
       .reject {|s| s.strip.empty? }
       .first.split(SPACES).take(5)
   end
