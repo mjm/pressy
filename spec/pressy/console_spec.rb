@@ -35,4 +35,12 @@ RSpec.describe Pressy::Console do
       expect(name).to eq "None of your business"
     end
   end
+
+  describe "running shell commands" do
+    it "runs the shell command and returns the process status" do
+      status = subject.run("exit 16")
+      expect(status.exitstatus).to be 16
+      expect(status).to be_exited
+    end
+  end
 end

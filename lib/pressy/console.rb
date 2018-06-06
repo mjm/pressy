@@ -14,4 +14,9 @@ class Pressy::Console
     value = echo ? input.gets : input.noecho(&:gets)
     value.chomp
   end
+
+  def run(*cmd)
+    system(*cmd)
+    $?
+  end
 end
