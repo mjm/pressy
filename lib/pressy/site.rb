@@ -53,6 +53,12 @@ class Pressy::Site
     push
   end
 
+  def create_post(post)
+    saved_post = client.create_post(post)
+    rendered_post = Pressy::PostRenderer.render(saved_post)
+    store.write(saved_post.id, rendered_post)
+  end
+
   def create(params = {})
     uri = URI.parse(params.fetch(:url))
 

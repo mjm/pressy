@@ -88,6 +88,20 @@ RSpec.describe Pressy::Site do
     end
   end
 
+  describe "creating a single post" do
+    let(:new_post) { double(:new_post) }
+    let(:saved_post) { double(:saved_post, id: 123) }
+    let(:rendered_saved_post) { double(:rendered_saved_post, path: "foo/bar.md") }
+
+    it "creates the post and saves it to the store" do
+      expect(wordpress).to receive(:create_post).with(new_post) { saved_post }
+      expect(Pressy::PostRenderer).to receive(:render).with(saved_post) { rendered_saved_post }
+      expect(store).to receive(:write).with(123, rendered_saved_post)
+
+      site.create_post(new_post)
+    end
+  end
+
   describe "creating a new site" do
     let(:user) { "john" }
     let(:password) { "password" }
