@@ -91,7 +91,8 @@ class Pressy::PostFilenameGenerator
     content_lines
       .map {|s| s.gsub(LINK_URLS, '\1').gsub(CHARACTERS_TO_STRIP, '') }
       .reject {|s| s.strip.empty? }
-      .first.split(SPACES).take(5)
+      .fetch(0, "")
+      .split(SPACES).take(5)
   end
 
   def content_lines
