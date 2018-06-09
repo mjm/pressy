@@ -12,12 +12,13 @@ module Pressy::Command
     Registry.default.register(command_class)
   end
 
-  def initialize(site, console)
+  def initialize(site, console, env)
     @site = site
     @console = console
+    @env = env
   end
 
-  attr_reader :site, :console
+  attr_reader :site, :console, :env
 
   def stdin
     console.input

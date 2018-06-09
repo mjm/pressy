@@ -7,7 +7,7 @@ def main
 
   action = ARGV.shift&.to_sym
 
-  runner = Pressy::Command::Runner.new(registry, site, Pressy::Console.new)
+  runner = Pressy::Command::Runner.new(registry, site, Pressy::Console.new, ENV)
   runner.run(action, *ARGV)
 end
 
