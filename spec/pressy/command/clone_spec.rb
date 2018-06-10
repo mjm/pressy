@@ -5,7 +5,7 @@ RSpec.describe Pressy::Command::Clone do
 
   context "when no site URL is provided" do
     it "raises an error" do
-      expect { subject.run({}) }.to raise_error("no site URL provided")
+      expect { runner.run(:clone) }.to raise_error("no site URL provided")
     end
   end
 
@@ -26,7 +26,7 @@ RSpec.describe Pressy::Command::Clone do
       expect(site).to receive(:create).with(url: clone_url, path: nil, username: "john", password: "password") { new_site }
       expect(new_site).to receive(:pull) { pull }
 
-      subject.run({}, clone_url)
+      runner.run(:clone, clone_url)
 
       expect(stderr.string).to eq <<~ERROR
 
@@ -42,7 +42,7 @@ RSpec.describe Pressy::Command::Clone do
       expect(site).to receive(:create).with(url: clone_url, path: "dir", username: "john", password: "password") { new_site }
       expect(new_site).to receive(:pull) { pull }
 
-      subject.run({}, clone_url, "dir")
+      runner.run(:clone, clone_url, "dir")
 
       expect(stderr.string).to eq <<~ERROR
 

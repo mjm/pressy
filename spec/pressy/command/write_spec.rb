@@ -32,28 +32,28 @@ RSpec.describe Pressy::Command::Write do
   context "when no arguments are provided" do
     it "builds an empty post with no options and edits it" do
       verify_write({})
-      subject.run({})
+      runner.run(:write)
     end
   end
 
   context "when the status is overridden" do
     it "builds an empty post with the status option and edits it" do
       verify_write status: "publish"
-      subject.run(status: "publish")
+      runner.run(:write, '-s', 'publish')
     end
   end
 
   context "when the title is overridden" do
     it "builds an empty post with the title option and edits it" do
       verify_write title: "My cool title"
-      subject.run(title: "My cool title")
+      runner.run(:write, '-t', 'My cool title')
     end
   end
 
   context "when the format is overridden" do
     it "builds an empty post with the format option and edits it" do
       verify_write format: "status"
-      subject.run(format: "status")
+      runner.run(:write, '-f', 'status')
     end
   end
 

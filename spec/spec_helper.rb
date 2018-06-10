@@ -19,7 +19,12 @@ RSpec.shared_examples "command" do |name|
   let(:env) { {} }
   let(:site) { instance_double("Pressy::Site") }
 
-  subject { described_class.new(site, console, env) }
+  let(:registry) { Pressy::Command::Registry.new }
+  let(:runner) { Pressy::Command::Runner.new(registry, site, console, env) }
+
+  before do
+    registry.register(described_class)
+  end
 
   it "has command name '#{name}'" do
     expect(described_class.name).to be name

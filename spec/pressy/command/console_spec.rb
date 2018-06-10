@@ -8,6 +8,6 @@ RSpec.describe Pressy::Command::Console do
       expect(bind.local_variable_get(:site)).to be site
     end
 
-    subject.run({})
+    runner.run(:console)
   end
 end
