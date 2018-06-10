@@ -9,31 +9,51 @@ RSpec.describe Pressy::Command::Write do
   let(:edited_post) { double(:edited_post) }
   let(:editor) { instance_double("Pressy::Editor") }
 
+  it "parses the short-form options" do
+    args = %w(-s foo -t bar -f baz a b c)
+    expect(described_class.parse!(args)).to eq({
+      status: "foo",
+      title: "bar",
+      format: "baz"
+    })
+    expect(args).to eq %w(a b c)
+  end
+
+  it "parses the long-form options" do
+    args = %w(--status=foo --title=bar --format baz a b c)
+    expect(described_class.parse!(args)).to eq({
+      status: "foo",
+      title: "bar",
+      format: "baz"
+    })
+    expect(args).to eq %w(a b c)
+  end
+
   context "when no arguments are provided" do
     it "builds an empty post with no options and edits it" do
       verify_write({})
-      subject.run
+      subject.run({})
     end
   end
 
   context "when the status is overridden" do
     it "builds an empty post with the status option and edits it" do
       verify_write status: "publish"
-      subject.run("-s", "publish")
+      subject.run(status: "publish")
     end
   end
 
   context "when the title is overridden" do
     it "builds an empty post with the title option and edits it" do
       verify_write title: "My cool title"
-      subject.run("-t", "My cool title")
+      subject.run(title: "My cool title")
     end
   end
 
   context "when the format is overridden" do
     it "builds an empty post with the format option and edits it" do
       verify_write format: "status"
-      subject.run("-f", "status")
+      subject.run(format: "status")
     end
   end
 

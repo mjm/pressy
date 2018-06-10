@@ -21,15 +21,16 @@ RSpec.describe Pressy::Command::Runner do
       before do
         expect(registry).to receive(:lookup).with(:pull) { command_type }
         expect(command_type).to receive(:new).with(site, console, env) { command }
+        allow(command_type).to receive(:parse!) { {} }
       end
 
       it "runs the matching command" do
-        expect(command).to receive(:run)
+        expect(command).to receive(:run).with({})
         subject.run(:pull)
       end
 
       it "passes arguments down to the command" do
-        expect(command).to receive(:run).with("a", "b")
+        expect(command).to receive(:run).with({}, "a", "b")
         subject.run(:pull, "a", "b")
       end
     end
@@ -43,5 +44,30 @@ RSpec.describe Pressy::Command::Runner do
         expect { subject.run(:pull) }.to raise_error("unexpected action 'pull'")
       end
     end
+
+    context "when the command defines options" do
+      let(:command_type) { FakeCommand }
+
+      before do
+        expect(registry).to receive(:lookup).with(:fake) { command_type }
+        expect(command_type).to receive(:new).with(site, console, env) { command }
+      end
+
+      it "parses the arguments and passes them to the command" do
+        expect(command).to receive(:run).with({ foo: "FOO", bar: "BAR"}, "other", "arg")
+        subject.run(:fake, "-f", "FOO", "--bar=BAR", "other", "arg")
+      end
+    end
+  end
+end
+
+class FakeCommand
+  include Pressy::Command
+  def self.name; :fake; end
+
+  option :foo, :f
+  option :bar, :b
+
+  def run(options, *args)
   end
 end

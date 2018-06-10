@@ -1,7 +1,7 @@
 Pressy::Command.define :clone do
   include Pressy::Command::ChangesetHelpers
 
-  def run(url = nil, directory = nil)
+  def run(options, url = nil, directory = nil)
     raise "no site URL provided" unless url
 
     username = console.prompt("Username:")

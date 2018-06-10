@@ -16,7 +16,7 @@ RSpec.describe Pressy::Command::Push do
     end
 
     it "reports that the site is already up-to-date" do
-      subject.run
+      subject.run({})
       expect(stderr.string).to eq "Already up-to-date.\n"
     end
   end
@@ -37,7 +37,7 @@ RSpec.describe Pressy::Command::Push do
     }
 
     it "reports the counts of the changes" do
-      subject.run
+      subject.run({})
       expect(stderr.string).to eq <<OUTPUT
 Added 2 posts.
 Updated 1 posts.

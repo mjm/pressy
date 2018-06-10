@@ -29,4 +29,10 @@ RSpec.shared_examples "command" do |name|
     registry = Pressy::Command::Registry.default
     expect(registry.lookup(name)).to be described_class
   end
+
+  it "parses an empty list of arguments" do
+    args = []
+    expect(described_class.parse!(args)).to eq({})
+    expect(args).to be_empty
+  end
 end

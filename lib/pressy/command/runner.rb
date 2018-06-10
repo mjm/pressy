@@ -10,6 +10,7 @@ class Pressy::Command::Runner
     raise "no action given" unless action
 
     command_type = @registry.lookup(action) or raise "unexpected action '#{action.to_s}'"
-    command_type.new(@site, @console, @env).run(*args)
+    options = command_type.parse!(args)
+    command_type.new(@site, @console, @env).run(options, *args)
   end
 end

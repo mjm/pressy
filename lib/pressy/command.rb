@@ -1,7 +1,7 @@
 module Pressy::Command
   def self.define(command_name, &definition)
     class_name = command_name.capitalize
-    command_class = Class.new(&definition)
+    command_class = Class.new
     self.const_set(class_name, command_class)
     command_class.class_eval %{
       def self.name
@@ -9,7 +9,12 @@ module Pressy::Command
       end
     }
     command_class.include self
+    command_class.class_eval(&definition)
     Registry.default.register(command_class)
+  end
+
+  def self.included(base)
+    base.extend ClassMethods
   end
 
   def initialize(site, console, env)
@@ -30,6 +35,31 @@ module Pressy::Command
 
   def stderr
     console.error
+  end
+
+  module ClassMethods
+    def option(long_name, short_name)
+      @options ||= []
+      @options << { key: long_name, long: long_name, short: short_name }
+    end
+
+    def parse!(args)
+      options = {}
+      OptionParser.new do |parser|
+        add_options_to_parser(parser, options)
+      end.parse!(args)
+      options
+    end
+
+    private
+
+    def add_options_to_parser(parser, options)
+      (@options || []).each do |opt|
+        parser.on("-#{opt[:short]}", "--#{opt[:long]}=#{opt[:long].upcase}") do |value|
+          options[opt[:key]] = value
+        end
+      end
+    end
   end
 
   module ChangesetHelpers

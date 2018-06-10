@@ -1,12 +1,16 @@
 require 'optparse'
 
 Pressy::Command.define :write do
-  def run(*args)
-    site.create_post(editor.edit(empty_post(args)))
+  option :status, :s
+  option :title, :t
+  option :format, :f
+
+  def run(options)
+    site.create_post(editor.edit(empty_post(options)))
   end
 
-  def empty_post(args)
-    Pressy::EmptyPost.build(parse(args))
+  def empty_post(options)
+    Pressy::EmptyPost.build(options)
   end
 
   def editor
